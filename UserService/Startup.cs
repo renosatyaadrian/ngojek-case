@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using UserService.Data;
 using UserService.Helper;
 using UserService.Models;
 
@@ -66,6 +67,8 @@ namespace UserService
                 };
             });
             
+            services.AddScoped<IUser, UserDAL>();
+
             services.AddAuthorization();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
