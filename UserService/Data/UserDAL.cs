@@ -17,12 +17,14 @@ namespace UserService.Data
     public class UserDAL : IUser
     {
         private readonly AppSettings _appSettings;
+        private readonly AppDbContext _dbContext;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public UserDAL(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<AppSettings> appSettings)
+        public UserDAL(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<AppSettings> appSettings, AppDbContext dbContext)
         {
             _appSettings = appSettings.Value;
+            _dbContext = dbContext;
             _roleManager = roleManager;
             _userManager = userManager;
         }
@@ -104,10 +106,26 @@ namespace UserService.Data
 
                 var userResult = await _userManager.FindByNameAsync(newUser.Email);
                 await _userManager.AddToRoleAsync(userResult, "User");  
+
+                var userEntity = new Customer
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    PhoneNumber = user.PhoneNumber,
+                    Email = user.Email,
+                    Balance = 0,
+                    CreatedDate = DateTime.Now,
+                    Blocked = false
+                };
+
+                Console.WriteLine(userEntity);
+
+                _dbContext.Customers.Add(userEntity);
+                await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error: {ex}");
+                throw new Exception($"Error: {ex.Message}");
             }
         }
     }
