@@ -12,9 +12,7 @@ namespace UserService.Models
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public int PhoneNumber { get; set; }
-        public double UserLatitude { get; set; }
-        public double UserLongitude { get; set; }
+        public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public double Balance { get; set; }
         public DateTime CreatedDate { get; set; }
