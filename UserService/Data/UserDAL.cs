@@ -101,10 +101,13 @@ namespace UserService.Data
                 var result = await _userManager.CreateAsync(newUser, user.Password);
                 if(!result.Succeeded)
                     throw new Exception($"Gagal menambahkan user {user.Username}. Error: {result.Errors.Select(error=>error.Description)}");
+
+                var userResult = await _userManager.FindByNameAsync(newUser.Email);
+                await _userManager.AddToRoleAsync(userResult, "User");  
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error: {ex.Message}");
+                throw new Exception($"Error: {ex}");
             }
         }
     }
