@@ -21,7 +21,7 @@ namespace UserService.Controllers
         }
 
         [HttpPost("Authentication")]
-        public async Task<ActionResult<User>> Login(CreateUserDto auth)
+        public async Task<ActionResult<User>> Login([FromBody] AuthenticateDto auth)
         {
             try
             {
