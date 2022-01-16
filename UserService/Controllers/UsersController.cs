@@ -20,7 +20,7 @@ namespace UserService.Controllers
             _user = user;
         }
 
-        [HttpGet("Authentication")]
+        [HttpPost("Authentication")]
         public async Task<ActionResult<User>> Login(CreateUserDto auth)
         {
             try
