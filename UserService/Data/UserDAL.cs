@@ -5,7 +5,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using UserService.Dtos;
@@ -20,13 +22,15 @@ namespace UserService.Data
         private readonly AppDbContext _dbContext;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserDAL(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<AppSettings> appSettings, AppDbContext dbContext)
+        public UserDAL(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<AppSettings> appSettings, AppDbContext dbContext, IHttpContextAccessor httpContextAccessor)
         {
             _appSettings = appSettings.Value;
             _dbContext = dbContext;
             _roleManager = roleManager;
             _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task AddRole(string rolename)
@@ -89,6 +93,15 @@ namespace UserService.Data
                 roles.Add(new CreateRoleDto{ RoleName = role.Name });
             }
             return roles;
+        }
+
+        public async Task<Customer> GetUserProfile()
+        {
+            var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
+            Console.WriteLine(username);
+            var cust = await _dbContext.Customers.Where(u => u.Username == username).SingleOrDefaultAsync();
+            if(cust == null) throw new ArgumentNullException(username);
+            return cust;
         }
 
         public async Task Registration(CreateUserDto user)

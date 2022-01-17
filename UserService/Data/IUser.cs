@@ -13,6 +13,6 @@ namespace UserService.Data
         Task<User> Authenticate(string username, string password);
         List<CreateRoleDto> GetAllRole();
         Task Registration(CreateUserDto user);
-
+        Task<Customer> GetUserProfile();
     }
 }
