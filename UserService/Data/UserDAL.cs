@@ -109,6 +109,7 @@ namespace UserService.Data
 
                 var userEntity = new Customer
                 {
+                    Username = user.Username,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
                     PhoneNumber = user.PhoneNumber,
