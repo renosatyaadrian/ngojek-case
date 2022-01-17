@@ -68,12 +68,27 @@ namespace UserService.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> RegisterUser(CreateUserDto createUserDto)
+        public async Task<ActionResult> RegisterUser([FromBody] CreateUserDto createUserDto)
         {
             try
             {
                  await _user.Registration(createUserDto);
                  return Ok($"Register user {createUserDto.Username} berhasil");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error : {ex.Message}");
+            }
+        }
+
+        [HttpPut("Topup")]
+        public async Task<ActionResult<CustomerBalanceDto>> TopupBalance(double amount)
+        {
+            try
+            {
+                var user = await _user.TopupBalance(amount);
+                var balance = _mapper.Map<CustomerBalanceDto>(user);
+                return Ok(balance);
             }
             catch (Exception ex)
             {
