@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -66,10 +67,12 @@ namespace UserService
                     ValidateAudience=false
                 };
             });
-            
-            services.AddScoped<IUser, UserDAL>();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-            services.AddAuthorization();
+            services.AddScoped<IUser, UserDAL>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            
+            services.AddAuthorization();    
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddControllers();
