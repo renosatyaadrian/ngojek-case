@@ -145,6 +145,7 @@ namespace UserService.Data
 
         public async Task<Customer> TopupBalance(double amount)
         {
+            if(amount <= 0 || amount > 100_000_000) throw new Exception("Value tidak boleh kurang dari 0 dan lebih dari Rp. 100.000.000,00");
             var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
             Console.WriteLine(username);
             var cust = await _dbContext.Customers.Where(u => u.Username == username).SingleOrDefaultAsync();
