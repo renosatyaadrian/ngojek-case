@@ -142,5 +142,23 @@ namespace UserService.Data
                 throw new Exception($"Error: {ex.Message}");
             }
         }
+
+        public async Task<Customer> TopupBalance(double amount)
+        {
+            var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
+            Console.WriteLine(username);
+            var cust = await _dbContext.Customers.Where(u => u.Username == username).SingleOrDefaultAsync();
+            if(cust == null) throw new ArgumentNullException(username);
+            try
+            {
+                cust.Balance += amount;
+                await _dbContext.SaveChangesAsync();
+                return cust;
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception($"Error: {ex.Message}");
+            }
+        }
     }
 }

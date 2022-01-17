@@ -14,5 +14,6 @@ namespace UserService.Data
         List<CreateRoleDto> GetAllRole();
         Task Registration(CreateUserDto user);
         Task<Customer> GetUserProfile();
+        Task<Customer> TopupBalance(double amount);
     }
 }
