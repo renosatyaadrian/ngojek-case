@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace UserService.Helper
 {
-    public class MathHelper
+    public static class MathHelper
     {
-        public double getDistanceFromLatLonInKm(double lat1, double lon1, double lat2, double lon2) {
+        public static double getDistanceFromLatLonInKm(double lat1, double lon1, double lat2, double lon2) {
             var R = 6371; // Radius of the earth in km
             var dLat = deg2rad(lat2-lat1);  // deg2rad below
             var dLon = deg2rad(lon2-lon1); 
@@ -21,8 +22,13 @@ namespace UserService.Helper
             return d;
             }
 
-        public double deg2rad(double deg) {
+        public static double deg2rad(double deg) {
             return deg * (Math.PI/180);
+        }
+
+        public static string ToRupiah(double angka)
+        {
+            return String.Format(CultureInfo.CreateSpecificCulture("id-id"), "Rp. {0:N}", angka);
         }
     }
 }
