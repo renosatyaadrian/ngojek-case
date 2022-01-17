@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using UserService.Data;
 using UserService.Dtos;
@@ -13,10 +14,12 @@ namespace UserService.Controllers
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
+        private readonly IMapper _mapper;
         private readonly IUser _user;
 
-        public UsersController(IUser user)
+        public UsersController(IMapper mapper, IUser user)
         {
+            _mapper = mapper;
             _user = user;
         }
 
@@ -48,6 +51,14 @@ namespace UserService.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpGet("Profile")]
+        public async Task<ActionResult<CustomerDto>> GetCustomerProfile()
+        {
+            var customer = await _user.GetUserProfile();
+            var dtos = _mapper.Map<CustomerDto>(customer);
+            return dtos;
         }
 
         [HttpGet("Roles")]
