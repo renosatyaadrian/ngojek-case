@@ -1,0 +1,16 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "b6293a33-09fc-41c1-ba24-caaeebebf24f": {
+      "ProjectGuid": "b6293a33-09fc-41c1-ba24-caaeebebf24f",
+      "DisplayName": "DriverService",
+      "ColorIndex": 0
+    },
+    "7d36e71e-7046-421b-8204-181f9ecfaa8e": {
+      "ProjectGuid": "7d36e71e-7046-421b-8204-181f9ecfaa8e",
+      "DisplayName": "UserService",
+      "ColorIndex": 1
+    }
+  },
+  "NextColorIndex": 2
+}
