@@ -53,7 +53,7 @@ namespace DriverService.Data
 
                 var driver = _context.Drivers.FirstOrDefault(dri => dri.Username == username);
 
-                if(driver.Blocked.Equals(true))
+                if(driver.Blocked.Equals(false))
                 {
                     var user = new User
                     {
