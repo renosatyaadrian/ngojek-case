@@ -51,32 +51,41 @@ namespace DriverService.Data
                     return null;
                 }
 
-                var user = new User
-                {
-                    Username = username
-                };
+                var driver = _context.Drivers.FirstOrDefault(dri => dri.Username == username);
 
-                List<Claim> claims = new List<Claim>();
-                claims.Add(new Claim(ClaimTypes.Name, user.Username));
-                var roles = await GetRolesFromUser(username);
-                foreach (var role in roles)
+                if(driver.Blocked.Equals(true))
                 {
-                    claims.Add(new Claim(ClaimTypes.Role, role));
+                    var user = new User
+                    {
+                        Username = username
+                    };
+
+                    List<Claim> claims = new List<Claim>();
+                    claims.Add(new Claim(ClaimTypes.Name, user.Username));
+                    var roles = await GetRolesFromUser(username);
+                    foreach (var role in roles)
+                    {
+                        claims.Add(new Claim(ClaimTypes.Role, role));
+                    }
+
+                    var tokenHandler = new JwtSecurityTokenHandler();
+                    var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+                    var tokenDescriptor = new SecurityTokenDescriptor
+                    {
+                        Subject = new ClaimsIdentity(claims),
+                        Expires = DateTime.UtcNow.AddHours(3),
+                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                        SecurityAlgorithms.HmacSha256Signature)
+                    };
+
+                    var token = tokenHandler.CreateToken(tokenDescriptor);
+                    user.Token = tokenHandler.WriteToken(token);
+                    return user;
                 }
-
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-                var tokenDescriptor = new SecurityTokenDescriptor
+                else
                 {
-                    Subject = new ClaimsIdentity(claims),
-                    Expires = DateTime.UtcNow.AddHours(3),
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256Signature)
-                };
-
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                user.Token = tokenHandler.WriteToken(token);
-                return user;
+                    return null;
+                }
             }
             catch (Exception ex)
             {
@@ -114,7 +123,7 @@ namespace DriverService.Data
                     Email = driverForCreateDto.Email,
                     Balance = 0,
                     CreatedDate = DateTime.Now,
-                    Blocked = false
+                    Blocked = true
                 };
 
                 Console.WriteLine(userEntity);
@@ -194,7 +203,7 @@ namespace DriverService.Data
             }
             else
             {
-                return Enumerable.Empty<Order>();
+                return null;
             }
         }
         public Order GetHistoryOrder()
