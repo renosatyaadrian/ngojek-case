@@ -82,6 +82,22 @@ namespace UserService.Controllers
             return Ok(_user.GetAllRole());
         }
 
+        [HttpGet("Order/{id}")]
+        public async Task<ActionResult<OrderFeeDto>> GetOrderFee(int id)
+        {
+            var order = await _user.GetOrderById(id);
+            var dtos = _mapper.Map<OrderFeeDto>(order);
+            return Ok(dtos); 
+        }
+
+        [HttpGet("Orders")]
+        public async Task<ActionResult<IEnumerable<OrderDto>>> GetOrderHistory()
+        {
+            var orders = await _user.GetOrdersHistory();
+            var dtos = _mapper.Map<IEnumerable<OrderDto>>(orders);
+            return Ok(dtos);
+        }
+
         [HttpPost]
         public async Task<ActionResult> RegisterUser([FromBody] CreateUserDto createUserDto)
         {
