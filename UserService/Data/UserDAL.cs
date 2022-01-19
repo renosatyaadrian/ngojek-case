@@ -140,6 +140,24 @@ namespace UserService.Data
             return roles;
         }
 
+        public async Task<Order> GetOrderById(int id)
+        {
+            var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
+            var cust = await _dbContext.Customers.Where(u => u.Username == username).SingleOrDefaultAsync();
+            if(cust == null) throw new Exception("Mohon login kembali");
+            var order = await _dbContext.Orders.FirstOrDefaultAsync(ord => ord.Id == id && ord.CustomerId == cust.Id);
+            if(order == null) throw new Exception($"Order tidak ditemukan");
+            return order;
+        }
+
+        public async Task<ICollection<Order>> GetOrdersHistory()
+        {
+            var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
+            var cust = await _dbContext.Customers.Where(u => u.Username == username).SingleOrDefaultAsync();
+            if(cust == null) throw new Exception("Mohon login kembali");
+            return await _dbContext.Orders.Where(ord => ord.CustomerId == cust.Id).ToListAsync();
+        }
+
         public async Task<Customer> GetUserProfile()
         {
             var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
