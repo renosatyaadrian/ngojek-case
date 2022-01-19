@@ -5,11 +5,14 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UserService.Dtos;
 using UserService.Helper;
 using UserService.Models;
@@ -20,14 +23,16 @@ namespace UserService.Data
     {
         private readonly AppSettings _appSettings;
         private readonly AppDbContext _dbContext;
+        private readonly KafkaSettings _kafkaSettings;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserDAL(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<AppSettings> appSettings, AppDbContext dbContext, IHttpContextAccessor httpContextAccessor)
+        public UserDAL(AppDbContext dbContext, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<AppSettings> appSettings, IOptions<KafkaSettings> kafkaSettings, IHttpContextAccessor httpContextAccessor)
         {
             _appSettings = appSettings.Value;
             _dbContext = dbContext;
+            _kafkaSettings = kafkaSettings.Value;
             _roleManager = roleManager;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
@@ -84,6 +89,46 @@ namespace UserService.Data
             return user;
         }
 
+        public async Task<Order> CreateOrder(CreateOrderDto cod)
+        {
+            var distance = MathHelper.getDistanceFromLatLonInKm(cod.UserLatitude, cod.UserLongitude, cod.UserTargetLatitude, cod.UserTargetLongitude);
+            if(distance > 100) throw new Exception("Jarak tidak boleh lebih dari 100 Km");
+            var roundedDistance = MathHelper.DistanceRounding(distance);
+            
+            var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
+            var cust = await _dbContext.Customers.Where(u => u.Username == username).SingleOrDefaultAsync();
+
+            var configApp = await _dbContext.ConfigApps.Where(conf => conf.Id == 1).FirstOrDefaultAsync();
+            var price = roundedDistance * configApp.PricePerKM;
+            try
+            {
+                var order = new Order()
+                {
+                    CustomerId = cust.Id,
+                    UserLatitude = cod.UserLatitude,
+                    UserLongitude = cod.UserLongitude,
+                    Distance = roundedDistance,
+                    Price = price,
+                    Completed = false
+                };
+                _dbContext.Orders.Add(order);
+                await _dbContext.SaveChangesAsync();
+                
+                var key = "order-create-" + DateTime.Now.ToString();
+                var val = JObject.FromObject(order, new JsonSerializer()
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                    }).ToString(Formatting.None);
+                string topic = "order-add";
+                await KafkaHelper.SendKafkaAsync(_kafkaSettings, topic, key, val);
+                return order;
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception($"Error : {ex.InnerException.Message}");
+            }
+        }
+
         public List<CreateRoleDto> GetAllRole()
         {
             List<CreateRoleDto> roles = new List<CreateRoleDto>();
@@ -98,7 +143,6 @@ namespace UserService.Data
         public async Task<Customer> GetUserProfile()
         {
             var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
-            Console.WriteLine(username);
             var cust = await _dbContext.Customers.Where(u => u.Username == username).SingleOrDefaultAsync();
             if(cust == null) throw new ArgumentNullException(username);
             return cust;
