@@ -91,11 +91,13 @@ namespace UserService.Data
 
         public async Task<Order> CreateOrder(CreateOrderDto cod)
         {
+            var distance = MathHelper.getDistanceFromLatLonInKm(cod.UserLatitude, cod.UserLongitude, cod.UserTargetLatitude, cod.UserTargetLongitude);
+            if(distance > 100) throw new Exception("Jarak tidak boleh lebih dari 100 Km");
+            var roundedDistance = MathHelper.DistanceRounding(distance);
+            
             var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
             var cust = await _dbContext.Customers.Where(u => u.Username == username).SingleOrDefaultAsync();
 
-            var distance = MathHelper.getDistanceFromLatLonInKm(cod.UserLatitude, cod.UserLongitude, cod.UserTargetLatitude, cod.UserTargetLongitude);
-            var roundedDistance = MathHelper.DistanceRounding(distance);
             var configApp = await _dbContext.ConfigApps.Where(conf => conf.Id == 1).FirstOrDefaultAsync();
             var price = roundedDistance * configApp.PricePerKM;
             try
