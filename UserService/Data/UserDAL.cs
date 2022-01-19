@@ -84,6 +84,36 @@ namespace UserService.Data
             return user;
         }
 
+        public async Task<Order> CreateOrder(CreateOrderDto cod)
+        {
+            var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
+            var cust = await _dbContext.Customers.Where(u => u.Username == username).SingleOrDefaultAsync();
+            
+            var distance = MathHelper.getDistanceFromLatLonInKm(cod.UserLatitude, cod.UserLongitude, cod.UserTargetLatitude, cod.UserTargetLongitude);
+            var roundedDistance = MathHelper.DistanceRounding(distance);
+            var configApp = await _dbContext.ConfigApps.Where(conf => conf.Id == 1).FirstOrDefaultAsync();
+            var price = roundedDistance * configApp.PricePerKM;
+            try
+            {
+                var order = new Order()
+                {
+                    CustomerId = cust.Id,
+                    UserLatitude = cod.UserLatitude,
+                    UserLongitude = cod.UserLongitude,
+                    Distance = roundedDistance,
+                    Price = price,
+                    Completed = false
+                };
+                _dbContext.Orders.Add(order);
+                await _dbContext.SaveChangesAsync();
+                return order;
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception($"Error : {ex.InnerException.Message}");
+            }
+        }
+
         public List<CreateRoleDto> GetAllRole()
         {
             List<CreateRoleDto> roles = new List<CreateRoleDto>();
@@ -98,7 +128,6 @@ namespace UserService.Data
         public async Task<Customer> GetUserProfile()
         {
             var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
-            Console.WriteLine(username);
             var cust = await _dbContext.Customers.Where(u => u.Username == username).SingleOrDefaultAsync();
             if(cust == null) throw new ArgumentNullException(username);
             return cust;

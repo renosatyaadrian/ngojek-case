@@ -15,5 +15,6 @@ namespace UserService.Data
         Task Registration(CreateUserDto user);
         Task<Customer> GetUserProfile();
         Task<Customer> TopupBalance(double amount);
+        Task<Order> CreateOrder(CreateOrderDto createOrderDto);
     }
 }
