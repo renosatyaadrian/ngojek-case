@@ -98,7 +98,7 @@ namespace UserService.Data
             
             var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
             if(username == null) throw new Exception("Mohon login kembali");
-            var cust = await _dbContext.Customers.Where(u => u.Username == username).SingleOrDefaultAsync();
+            var cust = await _dbContext.Customers.Where(u => u.Username == username && u.Blocked.Equals(false)).SingleOrDefaultAsync();
             var configApp = await _dbContext.ConfigApps.Where(conf => conf.Id == 1).FirstOrDefaultAsync();
             var price = roundedDistance * configApp.PricePerKM;
             try
