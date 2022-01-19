@@ -13,6 +13,7 @@ namespace UserService.Dtos
         public double Price { get; set; }
         public float Distance { get; set; }
         public bool? Completed { get; set; }
+        public bool PickedUp { get; set; }
         public double UserLatitude { get; set; }
         public double UserLongitude { get; set; }
     }
