@@ -53,6 +53,21 @@ namespace UserService.Controllers
             }
         }
 
+        [HttpPost("Order")]
+        public async Task<ActionResult<OrderDto>> CreateOrder([FromBody] CreateOrderDto createOrderDto)
+        {
+            try
+            {
+                var order = await _user.CreateOrder(createOrderDto);
+                var orderDto = _mapper.Map<OrderDto>(order);
+                return Ok(orderDto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet("Profile")]
         public async Task<ActionResult<CustomerDto>> GetCustomerProfile()
         {
