@@ -12,10 +12,9 @@ namespace DriverService.Models
         public int? DriverId { get; set; }
         public double? Price { get; set; }
         public float? Distance { get; set; }
-        public bool? Completed { get; set; }
-        [Required]
+        public bool PickedUp { get; set; }
+        public bool Completed { get; set; }
         public double UserLatitude { get; set; }
-        [Required]
         public double UserLongitude { get; set; }
         public Driver Driver { get; set; }
     }
