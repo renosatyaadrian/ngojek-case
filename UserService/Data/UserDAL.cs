@@ -5,11 +5,14 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UserService.Dtos;
 using UserService.Helper;
 using UserService.Models;
@@ -20,14 +23,16 @@ namespace UserService.Data
     {
         private readonly AppSettings _appSettings;
         private readonly AppDbContext _dbContext;
+        private readonly KafkaSettings _kafkaSettings;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserDAL(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<AppSettings> appSettings, AppDbContext dbContext, IHttpContextAccessor httpContextAccessor)
+        public UserDAL(AppDbContext dbContext, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<AppSettings> appSettings, IOptions<KafkaSettings> kafkaSettings, IHttpContextAccessor httpContextAccessor)
         {
             _appSettings = appSettings.Value;
             _dbContext = dbContext;
+            _kafkaSettings = kafkaSettings.Value;
             _roleManager = roleManager;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
@@ -88,7 +93,7 @@ namespace UserService.Data
         {
             var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
             var cust = await _dbContext.Customers.Where(u => u.Username == username).SingleOrDefaultAsync();
-            
+
             var distance = MathHelper.getDistanceFromLatLonInKm(cod.UserLatitude, cod.UserLongitude, cod.UserTargetLatitude, cod.UserTargetLongitude);
             var roundedDistance = MathHelper.DistanceRounding(distance);
             var configApp = await _dbContext.ConfigApps.Where(conf => conf.Id == 1).FirstOrDefaultAsync();
@@ -106,6 +111,14 @@ namespace UserService.Data
                 };
                 _dbContext.Orders.Add(order);
                 await _dbContext.SaveChangesAsync();
+                
+                var key = "order-create-" + DateTime.Now.ToString();
+                var val = JObject.FromObject(order, new JsonSerializer()
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                    }).ToString(Formatting.None);
+                string topic = "order-add";
+                await KafkaHelper.SendKafkaAsync(_kafkaSettings, topic, key, val);
                 return order;
             }
             catch (DbUpdateException ex)
