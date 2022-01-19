@@ -38,6 +38,7 @@ namespace UserService
             services.AddDbContext<AppDbContext>(options => 
             options.UseSqlServer(Configuration.GetConnectionString("LocalSQLEdge")));
             
+            services.AddAuthorization(); 
             services.AddIdentity<IdentityUser,IdentityRole>(options => {
                 options.Password.RequiredLength = 8;
                 options.Password.RequireLowercase = true;
@@ -71,8 +72,7 @@ namespace UserService
 
             services.AddScoped<IUser, UserDAL>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            
-            services.AddAuthorization();    
+               
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddControllers();

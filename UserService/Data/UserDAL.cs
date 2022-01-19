@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using HotChocolate.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -96,8 +97,8 @@ namespace UserService.Data
             var roundedDistance = MathHelper.DistanceRounding(distance);
             
             var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
-            var cust = await _dbContext.Customers.Where(u => u.Username == username).SingleOrDefaultAsync();
-
+            if(username == null) throw new Exception("Mohon login kembali");
+            var cust = await _dbContext.Customers.Where(u => u.Username == username && u.Blocked.Equals(false)).SingleOrDefaultAsync();
             var configApp = await _dbContext.ConfigApps.Where(conf => conf.Id == 1).FirstOrDefaultAsync();
             var price = roundedDistance * configApp.PricePerKM;
             try
@@ -140,11 +141,29 @@ namespace UserService.Data
             return roles;
         }
 
+        public async Task<Order> GetOrderById(int id)
+        {
+            var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
+            if(username == null) throw new Exception("Mohon login kembali");
+            var cust = await _dbContext.Customers.Where(u => u.Username == username).SingleOrDefaultAsync();
+            var order = await _dbContext.Orders.FirstOrDefaultAsync(ord => ord.Id == id && ord.CustomerId == cust.Id);
+            if(order == null) throw new Exception($"Order tidak ditemukan");
+            return order;
+        }
+
+        public async Task<ICollection<Order>> GetOrdersHistory()
+        {
+            var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
+            if(username == null) throw new Exception("Mohon login kembali");
+            var cust = await _dbContext.Customers.Where(u => u.Username == username).SingleOrDefaultAsync();
+            return await _dbContext.Orders.Where(ord => ord.CustomerId == cust.Id).ToListAsync();
+        }
+
         public async Task<Customer> GetUserProfile()
         {
             var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
+            if(username == null) throw new Exception("Mohon login kembali");
             var cust = await _dbContext.Customers.Where(u => u.Username == username).SingleOrDefaultAsync();
-            if(cust == null) throw new ArgumentNullException(username);
             return cust;
         }
 

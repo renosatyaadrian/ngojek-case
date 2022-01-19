@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserService.Data;
 using UserService.Dtos;
@@ -53,6 +54,7 @@ namespace UserService.Controllers
             }
         }
 
+        [Authorize(Roles = "User")]
         [HttpPost("Order")]
         public async Task<ActionResult<OrderDto>> CreateOrder([FromBody] CreateOrderDto createOrderDto)
         {
@@ -80,6 +82,24 @@ namespace UserService.Controllers
         public ActionResult<IEnumerable<CreateRoleDto>> GetAllRole()
         {
             return Ok(_user.GetAllRole());
+        }
+
+        [Authorize(Roles = "User")]
+        [HttpGet("Order/{id}")]
+        public async Task<ActionResult<OrderFeeDto>> GetOrderFee(int id)
+        {
+            var order = await _user.GetOrderById(id);
+            var dtos = _mapper.Map<OrderFeeDto>(order);
+            return Ok(dtos); 
+        }
+
+        [Authorize(Roles = "User")]
+        [HttpGet("Orders")]
+        public async Task<ActionResult<IEnumerable<OrderDto>>> GetOrderHistory()
+        {
+            var orders = await _user.GetOrdersHistory();
+            var dtos = _mapper.Map<IEnumerable<OrderDto>>(orders);
+            return Ok(dtos);
         }
 
         [HttpPost]
