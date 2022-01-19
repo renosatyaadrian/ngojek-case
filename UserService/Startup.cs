@@ -71,8 +71,8 @@ namespace UserService
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddScoped<IUser, UserDAL>();
+            services.AddScoped<IOrder, OrderDAL>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-               
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddControllers();
