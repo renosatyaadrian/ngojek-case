@@ -48,7 +48,7 @@ namespace DriverService.Data
                 var userFind = await _userManager.CheckPasswordAsync(await _userManager.FindByNameAsync(username), password);
                 if (!userFind)
                 {
-                    return null;
+                    throw new Exception("Mohon login kembali");
                 }
 
                 var driver = _context.Drivers.FirstOrDefault(dri => dri.Username == username);
@@ -84,7 +84,7 @@ namespace DriverService.Data
                 }
                 else
                 {
-                    return null;
+                    throw new Exception("Mohon tunggu sampai admin memvalidasi akun anda");
                 }
             }
             catch (Exception ex)
@@ -197,13 +197,13 @@ namespace DriverService.Data
             var driver = _context.Drivers.FirstOrDefault(dri => dri.Username == userName);
             var order = _context.Orders.FirstOrDefault();
 
-            if(MathHelper.getDistanceFromLatLonInKm((double)driver.DriverLatitude, (double)driver.DriverLongitude, order.UserLatitude, order.UserLongitude) <= 5)
+            if (MathHelper.getDistanceFromLatLonInKm((double)driver.DriverLatitude, (double)driver.DriverLongitude, order.UserLatitude, order.UserLongitude) <= 5 && order.PickedUp.Equals(false) && order.Completed.Equals(false)) 
             {
                 return _context.Orders.ToList();
             }
             else
             {
-                return null;
+                throw new Exception("Tidak ada orderan di dekat anda");
             }
         }
         public Order GetHistoryOrder()
@@ -218,15 +218,29 @@ namespace DriverService.Data
             var driver = _context.Drivers.FirstOrDefault(dri => dri.Username == userName);
             var result = _context.Orders.FirstOrDefault(ord => ord.CustomerId == custId);
 
+            if (result == null)
+            {
+                throw new Exception($"Order id {result.Id} tidak di temukan");
+            }
+
             result.DriverId = driver.Id;
+            result.PickedUp = true;
             _context.SaveChanges();
         }
 
         public void FinishOrder(int custId)
         {
+            var userName = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
+            var driver = _context.Drivers.FirstOrDefault(dri => dri.Username == userName);
             var result = _context.Orders.FirstOrDefault(ord => ord.CustomerId == custId);
 
+            if (result == null)
+            {
+                throw new Exception($"Order id {result.Id} tidak di temukan");
+            }
+
             result.Completed = true;
+            driver.Balance += (double)result.Price;
             _context.SaveChanges();
         }
     }
