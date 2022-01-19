@@ -13,8 +13,10 @@ namespace UserService.Profiles
         public OrderProfile()
         {
             CreateMap<Order, OrderDto>();
-            
             CreateMap<OrderDto, Order>();
+            
+            CreateMap<Order, OrderFeeDto>();
+            CreateMap<OrderFeeDto, Order>();
         }
     }
 }
