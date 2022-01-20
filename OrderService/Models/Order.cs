@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 #nullable disable
 
@@ -7,6 +8,7 @@ namespace OrderService.Models
 {
     public partial class Order
     {
+        [Key]
         public int Id { get; set; }
         public int CustomerId { get; set; }
         public int? DriverId { get; set; }
