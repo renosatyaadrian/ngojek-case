@@ -74,6 +74,7 @@ namespace UserService
             services.AddScoped<IUser, UserDAL>();
             services.AddScoped<IOrder, OrderDAL>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddHttpContextAccessor();
             services.AddHttpClient<IOrderDataClient, HttpOrderDataClient>();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
