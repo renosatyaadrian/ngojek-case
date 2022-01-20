@@ -42,7 +42,7 @@ namespace DriverService.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest($"Bad Request: {ex.Message}");
             }
         }
 
@@ -65,7 +65,7 @@ namespace DriverService.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPut("Position")]
         public async Task<ActionResult<DriverDto>> SetPositionAsync(SetPositionDto setPositionDto)
         {
             try

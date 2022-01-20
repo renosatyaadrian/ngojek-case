@@ -80,7 +80,7 @@ namespace DriverService.SyncDataService.Http
         public async Task<IEnumerable<OrderDto>> GetOrderFromOrderService()
         {
 
-            var response = await _httpClient.GetAsync(_configuration["OrderService"]);
+            var response = await _httpClient.GetAsync(_configuration["GetOrder"]);
 
             var httpContent = response.Content.ReadAsStringAsync();
 
@@ -123,7 +123,7 @@ namespace DriverService.SyncDataService.Http
                 JsonSerializer.Serialize(driverForSendHttp),
                 Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync(_configuration["OrderService"],
+            var response = await _httpClient.PostAsync(_configuration["PostDriver"],
                 httpContent);
 
             if (response.IsSuccessStatusCode)

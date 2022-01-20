@@ -22,7 +22,7 @@ namespace OrderService.Controllers
             _mapper = mapper;
         }
 
-        [HttpPost]
+        [HttpPost("Driver")]
         public ActionResult<DriverDto> CreateDriver(DriverForCreateDto driverForCreateDto)
         {
             try
@@ -75,7 +75,7 @@ namespace OrderService.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpGet("Order")]
         public ActionResult<IEnumerable<ReadOrderDto>> GetAllOrders()
         {
             try
