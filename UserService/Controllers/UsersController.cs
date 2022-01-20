@@ -88,12 +88,12 @@ namespace UserService.Controllers
         }
 
         [Authorize(Roles = "User")]
-        [HttpGet("Order/{id}")]
+        [HttpGet("Order/{id}/OrderFee")]
         public async Task<ActionResult<OrderFeeDto>> GetOrderFee(int id)
         {
             var user = await _user.GetUserProfile();
             var order = _dataClient.GetUserOrderById(user.Id, id);
-            var dtos = _mapper.Map<OrderFeeDto>(order);
+            var dtos = _mapper.Map<OrderFeeDto>(order.Result);
             return Ok(dtos); 
         }
 
@@ -102,7 +102,7 @@ namespace UserService.Controllers
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetOrderHistory()
         {
             var user = await _user.GetUserProfile();
-            var orders = _dataClient.GetUserOrdersHistory(user.Id);
+            var orders = _dataClient.GetUserOrdersHistory(user.Id).Result;
             return Ok(orders);
         }
 
