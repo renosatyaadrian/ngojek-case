@@ -102,39 +102,47 @@ namespace DriverService.Data
         {
             try
             {
-                var newUser = new IdentityUser
+                var roleExist = await _roleManager.RoleExistsAsync("Driver");
+                if (!roleExist.Equals(false))
                 {
-                    UserName = driverForCreateDto.Username,
-                    Email = driverForCreateDto.Username
+                    var newUser = new IdentityUser
+                    {
+                        UserName = driverForCreateDto.Username,
+                        Email = driverForCreateDto.Username
 
-                };
+                    };
 
-                var result = await _userManager.CreateAsync(newUser, driverForCreateDto.Password);
-                if (!result.Succeeded)
-                {
-                    throw new Exception("Gagal Menambahkan User");
+                    var result = await _userManager.CreateAsync(newUser, driverForCreateDto.Password);
+                    if (!result.Succeeded)
+                    {
+                        throw new Exception("Gagal Menambahkan User");
+                    }
+
+                    var userResult = await _userManager.FindByNameAsync(newUser.Email);
+                    await _userManager.AddToRoleAsync(userResult, "Driver");
+
+                    var userEntity = new Driver
+                    {
+                        Username = driverForCreateDto.Username,
+                        FirstName = driverForCreateDto.FirstName,
+                        LastName = driverForCreateDto.LastName,
+                        PhoneNumber = driverForCreateDto.PhoneNumber,
+                        Email = driverForCreateDto.Email,
+                        Balance = 0,
+                        CreatedDate = DateTime.Now,
+                        Blocked = true
+                    };
+
+                    Console.WriteLine(userEntity);
+
+                    _context.Drivers.Add(userEntity);
+                    await _context.SaveChangesAsync();
                 }
-
-                var userResult = await _userManager.FindByNameAsync(newUser.Email);
-                await _userManager.AddToRoleAsync(userResult, "Driver");
-
-                var userEntity = new Driver
+                else
                 {
-                    Username = driverForCreateDto.Username,
-                    FirstName = driverForCreateDto.FirstName,
-                    LastName = driverForCreateDto.LastName,
-                    PhoneNumber = driverForCreateDto.PhoneNumber,
-                    Email = driverForCreateDto.Email,
-                    Balance = 0,
-                    CreatedDate = DateTime.Now,
-                    Blocked = true
-                };
-
-                Console.WriteLine(userEntity);
-
-                _context.Drivers.Add(userEntity);
-                await _context.SaveChangesAsync();
-
+                    await AddRole("Driver");
+                    throw new Exception($"Role Driver Belum Ada --> Menambhakan Role Driver");
+                }
             }
             catch (Exception ex)
             {
@@ -161,6 +169,25 @@ namespace DriverService.Data
             {
 
                 throw new Exception($"Error: {ex.Message}");
+            }
+        }
+
+        public async Task AddRole(string rolename)
+        {
+            try
+            {
+                var roleIsExist = await _roleManager.RoleExistsAsync(rolename);
+                if (roleIsExist)
+                {
+                    throw new Exception($"Role {rolename} sudah terdaftar");
+                }
+
+                else
+                    await _roleManager.CreateAsync(new IdentityRole(rolename));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
 

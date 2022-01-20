@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace OrderService.Data
 {
-    public class DriverRepo
+    public class DriverRepo : IDriverRepo
     {
         private readonly AppDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;

@@ -35,16 +35,18 @@ namespace DriverService.Controllers
             try
             {
                 Console.WriteLine($"--> User Registration With Username: {driverForCreateDto.Username} .....");
+                var drivermodel = _mapper.Map<Driver>(driverForCreateDto);
                 await _repository.Registration(driverForCreateDto);
+                _repository.SaveChanges();
 
-                var httpcontent = _mapper.Map<DriverForSendHttpDto>(driverForCreateDto);
+                var httpcontent = _mapper.Map<DriverForSendHttpDto>(drivermodel);
 
-                if (driverForCreateDto != null)
+                if (httpcontent != null)
                 {
                     try
                     {
                         await _driverDataClient.SendDriverToOrderService(httpcontent);
-                        return Ok($"Registrasi Driver: {driverForCreateDto.Username} Telah Berhasil");
+                        return Ok($"Registrasi Driver: {httpcontent.Username} Telah Berhasil");
                     }
                     catch (Exception ex)
                     {
@@ -61,12 +63,12 @@ namespace DriverService.Controllers
 
         [HttpPost("Authentication")]
         [AllowAnonymous]
-        public async Task<ActionResult<Driver>> Login(UserForCreateDto userForCreateDto)
+        public async Task<ActionResult<Driver>> Login(LoginDto loginDto)
         {
             try
             {
-                Console.WriteLine($"--> User Login With Username: {userForCreateDto.Username} .....");
-                var user = await _repository.Login(userForCreateDto.Username, userForCreateDto.Password);
+                Console.WriteLine($"--> User Login With Username: {loginDto.Username} .....");
+                var user = await _repository.Login(loginDto.Username, loginDto.Password);
                 if (user == null)
                 {
                     return BadRequest("Username / Password Tidak Tepat");
