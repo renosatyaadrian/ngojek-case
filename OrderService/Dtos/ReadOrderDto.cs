@@ -1,6 +1,6 @@
-﻿namespace DriverService.Dtos
+﻿namespace OrderService.Dtos
 {
-    public class OrderDto
+    public class ReadOrderDto
     {
         public int Id { get; set; }
         public int CustomerId { get; set; }

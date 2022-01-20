@@ -14,7 +14,9 @@ namespace OrderService.Profiles
         {
             CreateMap<Order, OrderDto>();
             CreateMap<OrderDto, Order>();
-            
+            CreateMap<Order, ReadOrderDto>();
+
+            CreateMap<ReadOrderDto, Order>();
             CreateMap<Order, OrderFeeDto>();
             CreateMap<OrderFeeDto, Order>();
         }

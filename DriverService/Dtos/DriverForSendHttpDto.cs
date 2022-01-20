@@ -1,19 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
-#nullable disable
-
-namespace OrderService.Models
+namespace DriverService.Dtos
 {
-    public partial class Driver
+    public class DriverForSendHttpDto
     {
-        public Driver()
-        {
-            Orders = new HashSet<Order>();
-        }
-
-        [Key]
         public int Id { get; set; }
         public string Username { get; set; }
         public string FirstName { get; set; }
@@ -24,6 +14,5 @@ namespace OrderService.Models
         public double? DriverLongitude { get; set; }
         public double Balance { get; set; }
         public DateTime CreatedDate { get; set; }
-        public virtual ICollection<Order> Orders { get; set; }
     }
 }
