@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using OrderService.Data;
+using OrderService.KafkaHandler;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,8 +32,12 @@ namespace OrderService
             services.AddDbContext<AppDbContext>(options => 
             options.UseSqlServer(Configuration.GetConnectionString("LocalSQLEdge")));
             
+            services.AddScoped<IOrder,OrderDAL>();
+
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options=>
+            options.SerializerSettings.ReferenceLoopHandling=Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+       
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "OrderService", Version = "v1" });
@@ -59,6 +64,8 @@ namespace OrderService
             {
                 endpoints.MapControllers();
             });
+
+            MessageConsumer.Consume();
         }
     }
 }
