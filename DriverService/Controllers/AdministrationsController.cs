@@ -1,10 +1,13 @@
-﻿using DriverService.Data;
+﻿using AutoMapper;
+using DriverService.Data;
 using DriverService.Dtos;
 using DriverService.Models;
+using DriverService.SyncDataService.Http;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DriverService.Controllers
@@ -14,10 +17,15 @@ namespace DriverService.Controllers
     public class AdministrationsController : ControllerBase
     {
         private readonly IDriverRepo _repository;
+        private readonly IDriverDataClient _driverDataClient;
+        private readonly IMapper _mapper;
 
-        public AdministrationsController(IDriverRepo repository)
+        public AdministrationsController(IDriverRepo repository, IDriverDataClient driverDataClient, IMapper mapper)
         {
             _repository = repository;
+            _driverDataClient = driverDataClient;
+            _mapper = mapper;
+            _driverDataClient = driverDataClient;
         }
 
         [HttpPost("Regitration")]
@@ -28,7 +36,22 @@ namespace DriverService.Controllers
             {
                 Console.WriteLine($"--> User Registration With Username: {driverForCreateDto.Username} .....");
                 await _repository.Registration(driverForCreateDto);
-                return Ok($"Registrasi User: {driverForCreateDto.Username} Telah Berhasil");
+
+                var httpcontent = _mapper.Map<DriverForSendHttpDto>(driverForCreateDto);
+
+                if (driverForCreateDto != null)
+                {
+                    try
+                    {
+                        await _driverDataClient.SendDriverToOrderService(httpcontent);
+                        return Ok($"Registrasi Driver: {driverForCreateDto.Username} Telah Berhasil");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"--> Could Not Send Synchronously: {ex.Message}");
+                    }
+                }
+                return NotFound();
             }
             catch (Exception ex)
             {

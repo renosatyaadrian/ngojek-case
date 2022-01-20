@@ -2,6 +2,7 @@
 using DriverService.Data;
 using DriverService.Dtos;
 using DriverService.Models;
+using DriverService.SyncDataService.Http;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,11 +17,13 @@ namespace DriverService.Controllers
     public class ProfilesController : ControllerBase
     {
         private readonly IDriverRepo _repository;
-        private IMapper _mapper;
+        private readonly IDriverDataClient _driverDataClient;
+        private readonly IMapper _mapper;
 
-        public ProfilesController(IDriverRepo repository, IMapper mapper)
+        public ProfilesController(IDriverRepo repository, IDriverDataClient driverDataClient, IMapper mapper)
         {
             _repository = repository;
+            _driverDataClient = driverDataClient;
             _mapper = mapper;
         }
 
@@ -62,50 +65,29 @@ namespace DriverService.Controllers
             }
         }
 
-        [HttpPost]
-        public ActionResult<DriverDto> CreateDriver(DriverForCreateDto driverForCreateDto)
-        {
-            try
-            {
-                Console.WriteLine("--> Creating Driver .....");
-                var drivermodel = _mapper.Map<Driver>(driverForCreateDto);
-                _repository.CreateDriver(drivermodel);
-                _repository.SaveChanges();
-
-                var driverReadDto = _mapper.Map<DriverDto>(drivermodel);
-
-                if (driverReadDto != null)
-                {
-                    try
-                    {
-                        return Ok(driverReadDto);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"--> Could Not Send Message: {ex.Message}");
-                    }
-                }
-                return NotFound();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
         [HttpPut]
-        public ActionResult<DriverDto> SetPosition(SetPositionDto setPositionDto)
+        public async Task<ActionResult<DriverDto>> SetPositionAsync(SetPositionDto setPositionDto)
         {
             try
             {
                 Console.WriteLine($"--> Setting Driver Position.....");
                 var drivermodel = _mapper.Map<Driver>(setPositionDto);
-                _repository.SetPosition(drivermodel);
-                _repository.SaveChanges();
 
                 if (drivermodel != null)
                 {
-                    return Ok(drivermodel);
+                    try
+                    {
+                        await _driverDataClient.SetPositionToOrderServicee(setPositionDto);
+
+                        _repository.SetPosition(drivermodel);
+                        _repository.SaveChanges();
+
+                        return Ok($"Set Position Driver, Lat: {setPositionDto.DriverLatitude}, Long: {setPositionDto.DriverLongitude} Telah Berhasil");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"--> Could Not Send Synchronously: {ex.Message}");
+                    }
                 }
                 return NotFound();
             }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace DriverService.Controllers
 {
@@ -16,8 +17,9 @@ namespace DriverService.Controllers
     {
         private readonly IDriverRepo _repository;
         private IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public OrdersController(IDriverRepo repository, IMapper mapper)
+        public OrdersController(IDriverRepo repository, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
             _mapper = mapper;
@@ -28,9 +30,13 @@ namespace DriverService.Controllers
         {
             try
             {
-                Console.WriteLine("--> Getting Enrollments .....");
+                Console.WriteLine("--> Getting Order .....");
                 var orderitem = _repository.GetAllOrders();
-                return Ok(_mapper.Map<IEnumerable<OrderDto>>(orderitem));
+                if (orderitem != null)
+                {
+                    return Ok(orderitem);
+                }
+                return NotFound();
             }
             catch (Exception ex)
             {
@@ -43,11 +49,13 @@ namespace DriverService.Controllers
         {
             try
             {
-                Console.WriteLine($"--> Getting History Driver With Id: {_repository.GetHistoryOrder().DriverId} .....");
+                var userName = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
+
+                Console.WriteLine($"--> Getting History Driver With Username: {userName} .....");
                 var orderitem = _repository.GetHistoryOrder();
                 if (orderitem != null)
                 {
-                    return Ok(_mapper.Map<OrderDto>(orderitem));
+                    return Ok(orderitem);
                 }
                 return NotFound();
             }
@@ -65,7 +73,6 @@ namespace DriverService.Controllers
                 Console.WriteLine($"--> Driver Accepting Order With Customer Id: {custId}.....");
 
                 _repository.AcceptOrder(custId);
-                _repository.SaveChanges();
 
                 return Ok("Order Has Been Accepted");
             }
@@ -83,7 +90,6 @@ namespace DriverService.Controllers
                 Console.WriteLine($"--> Driver Accepting Order With Customer Id: {custId}.....");
 
                 _repository.FinishOrder(custId);
-                _repository.SaveChanges();
 
                 return Ok("Order Has Been Finished");
             }

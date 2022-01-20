@@ -17,12 +17,11 @@ namespace DriverService.Data
         //Profile
         Driver ShowProfile();
         Driver ShowSaldo();
-        void CreateDriver(Driver driver);
         void SetPosition(Driver obj);
 
         //Order
-        IEnumerable<Order> GetAllOrders();
-        Order GetHistoryOrder();
+        IEnumerable<OrderDto> GetAllOrders();
+        IEnumerable<OrderDto> GetHistoryOrder();
         void AcceptOrder(int custId);
         void FinishOrder(int custId);
     }
