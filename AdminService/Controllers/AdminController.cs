@@ -25,7 +25,7 @@ namespace AdminService.Controllers
         private IMapper _mapper;
         private IAdmin _admin;
 
-        public AdminController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, 
+        public AdminController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager,
             IMapper mapper, IAdmin admin, IAdminDataClient dataClient, IOptions<AppSettings> appSettings)
         {
             _mapper = mapper;
@@ -95,6 +95,22 @@ namespace AdminService.Controllers
                 return Ok(customer);
             }
             catch (System.Exception ex)
+            {
+                Console.WriteLine(ex);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        //Transaction
+        [HttpGet("Transaction")]
+        public async Task<ActionResult<IEnumerable<OrderDto>>> GetTransaction()
+        {
+            try
+            {
+                var customer = await _dataClient.GetTransaction();
+                return Ok(customer);
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine(ex);
                 return BadRequest(ex.Message);
