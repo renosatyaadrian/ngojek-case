@@ -65,7 +65,7 @@ namespace OrderService
                 endpoints.MapControllers();
             });
 
-            // MessageConsumer.Consume();
+            MessageConsumer.Consume();
         }
     }
 }
