@@ -17,6 +17,8 @@ namespace UserService.Profiles
             
             CreateMap<Order, OrderFeeDto>();
             CreateMap<OrderFeeDto, Order>();
+
+            CreateMap<OrderDto, OrderFeeDto>();
         }
     }
 }

@@ -20,6 +20,7 @@ using Microsoft.OpenApi.Models;
 using UserService.Data;
 using UserService.Helper;
 using UserService.Models;
+using UserService.SyncDataServices.Http;
 
 namespace UserService
 {
@@ -73,6 +74,8 @@ namespace UserService
             services.AddScoped<IUser, UserDAL>();
             services.AddScoped<IOrder, OrderDAL>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddHttpContextAccessor();
+            services.AddHttpClient<IOrderDataClient, HttpOrderDataClient>();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddControllers();

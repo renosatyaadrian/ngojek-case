@@ -14,8 +14,6 @@ namespace UserService.Data
         List<CreateRoleDto> GetAllRole();
         Task Registration(CreateUserDto user);
         Task<Customer> GetUserProfile();
-        Task<ICollection<Order>> GetOrdersHistory();
-        Task<Order> GetOrderById(int id);
         Task<Customer> TopupBalance(double amount);
         Task<Order> CreateOrder(CreateOrderDto createOrderDto);
     }
