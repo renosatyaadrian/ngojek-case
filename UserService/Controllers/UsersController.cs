@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using UserService.Data;
 using UserService.Dtos;
 using UserService.Models;
+using UserService.SyncDataServices.Http;
 
 namespace UserService.Controllers
 {
@@ -15,11 +16,13 @@ namespace UserService.Controllers
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
+        private readonly IOrderDataClient _dataClient;
         private readonly IMapper _mapper;
         private readonly IUser _user;
 
-        public UsersController(IMapper mapper, IUser user)
+        public UsersController(IMapper mapper, IUser user, IOrderDataClient dataClient)
         {
+            _dataClient = dataClient;
             _mapper = mapper;
             _user = user;
         }
@@ -88,7 +91,8 @@ namespace UserService.Controllers
         [HttpGet("Order/{id}")]
         public async Task<ActionResult<OrderFeeDto>> GetOrderFee(int id)
         {
-            var order = await _user.GetOrderById(id);
+            var user = await _user.GetUserProfile();
+            var order = _dataClient.GetUserOrderById(user.Id, id);
             var dtos = _mapper.Map<OrderFeeDto>(order);
             return Ok(dtos); 
         }
@@ -97,9 +101,9 @@ namespace UserService.Controllers
         [HttpGet("Orders")]
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetOrderHistory()
         {
-            var orders = await _user.GetOrdersHistory();
-            var dtos = _mapper.Map<IEnumerable<OrderDto>>(orders);
-            return Ok(dtos);
+            var user = await _user.GetUserProfile();
+            var orders = _dataClient.GetUserOrdersHistory(user.Id);
+            return Ok(orders);
         }
 
         [HttpPost]
