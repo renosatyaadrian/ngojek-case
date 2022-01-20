@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace UserService.Dtos
@@ -16,5 +17,10 @@ namespace UserService.Dtos
         public bool PickedUp { get; set; }
         public double UserLatitude { get; set; }
         public double UserLongitude { get; set; }
+
+        public static implicit operator OrderDto(HttpResponseMessage v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
