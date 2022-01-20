@@ -44,10 +44,6 @@ namespace OrderService.Data
                 if(order.Completed == true) throw new Exception($"Order sudah selesai / dibayar");
                 order.Completed = true;
 
-                var user = await _dbContext.Customers.FirstOrDefaultAsync(cust => cust.Id == order.CustomerId);
-                if(user.Balance<order.Price) throw new Exception($"Dana di saldo kurang, mohon top up terlebih dahulu"); 
-                user.Balance-=order.Price;
-
                 var driver = await _dbContext.Drivers.FirstOrDefaultAsync(driver => driver.Id == driver.Id);
                 driver.Balance+=order.Price;
                 
