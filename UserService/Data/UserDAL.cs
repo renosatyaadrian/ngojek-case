@@ -17,6 +17,7 @@ using Newtonsoft.Json.Linq;
 using UserService.Dtos;
 using UserService.Helper;
 using UserService.Models;
+using UserService.SyncDataServices.Http;
 
 namespace UserService.Data
 {
@@ -28,8 +29,9 @@ namespace UserService.Data
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IOrderDataClient _orderDataClient;
 
-        public UserDAL(AppDbContext dbContext, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<AppSettings> appSettings, IOptions<KafkaSettings> kafkaSettings, IHttpContextAccessor httpContextAccessor)
+        public UserDAL(AppDbContext dbContext, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<AppSettings> appSettings, IOptions<KafkaSettings> kafkaSettings, IHttpContextAccessor httpContextAccessor, IOrderDataClient orderDataClient)
         {
             _appSettings = appSettings.Value;
             _dbContext = dbContext;
@@ -37,6 +39,7 @@ namespace UserService.Data
             _roleManager = roleManager;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
+            _orderDataClient = orderDataClient;
         }
 
         public async Task AddRole(string rolename)
@@ -139,24 +142,6 @@ namespace UserService.Data
                 roles.Add(new CreateRoleDto{ RoleName = role.Name });
             }
             return roles;
-        }
-
-        public async Task<Order> GetOrderById(int id)
-        {
-            var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
-            if(username == null) throw new Exception("Mohon login kembali");
-            var cust = await _dbContext.Customers.Where(u => u.Username == username).SingleOrDefaultAsync();
-            var order = await _dbContext.Orders.FirstOrDefaultAsync(ord => ord.Id == id && ord.CustomerId == cust.Id);
-            if(order == null) throw new Exception($"Order tidak ditemukan");
-            return order;
-        }
-
-        public async Task<ICollection<Order>> GetOrdersHistory()
-        {
-            var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
-            if(username == null) throw new Exception("Mohon login kembali");
-            var cust = await _dbContext.Customers.Where(u => u.Username == username).SingleOrDefaultAsync();
-            return await _dbContext.Orders.Where(ord => ord.CustomerId == cust.Id).ToListAsync();
         }
 
         public async Task<Customer> GetUserProfile()
