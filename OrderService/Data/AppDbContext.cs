@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Configuration;
 using OrderService.Models;
 
 #nullable disable
@@ -24,6 +25,11 @@ namespace OrderService.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            var builder = new ConfigurationBuilder()
+                   .AddJsonFile($"appsettings.json", true, true);
+
+            var config = builder.Build();
+            optionsBuilder.UseSqlServer(config["ConnectionStrings:LocalSQLEdge"]);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

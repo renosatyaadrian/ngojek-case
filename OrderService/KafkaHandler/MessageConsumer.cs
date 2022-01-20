@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using AutoMapper.Configuration;
 using Confluent.Kafka;
 using Confluent.Kafka.Admin;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -63,7 +65,7 @@ namespace OrderService.KafkaHandler
             var Serverconfig = new ConsumerConfig
             {
                 BootstrapServers = config["Settings:KafkaServer"],
-                GroupId = "orders",
+                GroupId = "orders-1",
                 AutoOffsetReset = AutoOffsetReset.Latest
             };
             CancellationTokenSource cts = new CancellationTokenSource();
@@ -86,7 +88,6 @@ namespace OrderService.KafkaHandler
 
                         using (var dbcontext = new AppDbContext())
                         {
-                            Console.WriteLine("Opening Database");
                             switch(cr.Topic)
                             {
                                 case "order-add":
@@ -102,14 +103,9 @@ namespace OrderService.KafkaHandler
                                     PickedUp = orderDto.PickedUp,
                                     Completed = orderDto.Completed
                                 };
-
-                                Console.WriteLine(order.Id);
                                 dbcontext.Orders.Add(order);
-                                Console.WriteLine("Add Success");
                                 break;
                             }
-                            
-                            Console.WriteLine("Out Success");
                             await dbcontext.SaveChangesAsync();
                             Console.WriteLine("Data was saved into database");
                         }
