@@ -19,7 +19,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using AdminService.SyncDataServices.Http;
 
 namespace AdminService
 {
@@ -71,8 +70,6 @@ namespace AdminService
 
             services.AddScoped<IAdmin, AdminDAL>();
             services.AddTransient<DbInitializer>();
-            services.AddHttpClient<IAdminDataClient, HttpAdminDataClient>();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddAuthorization();
 
@@ -82,6 +79,7 @@ namespace AdminService
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "AdminService", Version = "v1" });
+                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
                 var securitySchema = new OpenApiSecurityScheme
                 {
                     Description = "Jwt Authorization dengan Bearer token",
