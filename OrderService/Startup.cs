@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OrderService.Configs;
 using OrderService.Data;
+using OrderService.Helpers;
 using OrderService.KafkaHandler;
 using System;
 using System.Collections.Generic;
@@ -24,32 +25,44 @@ namespace OrderService
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public IConfiguration Configuration { get; }
+        private readonly IWebHostEnvironment _env;
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            _env = env;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // databases
-            services.AddDbContext<AppDbContext>(options => 
-            options.UseSqlServer(Configuration.GetConnectionString("LocalSQLEdge")));
-            
+            if (_env.IsProduction())
+            {
+                Console.WriteLine("--> using sql server db");
+                services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(
+                    Configuration.GetConnectionString("AzureConnection")
+                ));
+            }
+            else
+            {
+                Console.WriteLine("--> using local sql server db");
+                services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(
+                    Configuration.GetConnectionString("LocalSQLEdge")
+                ));
+            }
+
             services.AddScoped<IOrder,OrderDAL>();
 
             services.AddScoped<IDriverRepo, DriverRepo>();
             
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddControllers().AddNewtonsoftJson(options=>
             options.SerializerSettings.ReferenceLoopHandling=Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-       
-            // authentication
-            services.AddAuthorization(); 
+
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
             var appSettings = appSettingsSection.Get<AppSettings>();
@@ -62,17 +75,16 @@ namespace OrderService
             {
                 x.RequireHttpsMetadata = false;
                 x.SaveToken = true;
-                x.TokenValidationParameters = 
+                x.TokenValidationParameters =
                 new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey=new SymmetricSecurityKey(key),
-                    ValidateIssuer=false,
-                    ValidateAudience=false
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
                 };
             });
 
-            // swagger config
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Customer Service", Version = "v1" });

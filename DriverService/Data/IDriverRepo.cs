@@ -13,6 +13,7 @@ namespace DriverService.Data
         Task<User> Login(string username, string password);
         Task Registration(DriverForCreateDto driverForCreateDto);
         Task<List<string>> GetRolesFromUser(string username);
+        Task AddRole(string rolename);
 
         //Profile
         Driver ShowProfile();

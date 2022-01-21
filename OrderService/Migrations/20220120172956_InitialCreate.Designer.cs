@@ -10,8 +10,8 @@ using OrderService.Data;
 namespace OrderService.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220120052320_Initial")]
-    partial class Initial
+    [Migration("20220120172956_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -84,13 +84,13 @@ namespace OrderService.Migrations
                     b.Property<double>("Balance")
                         .HasColumnType("float");
 
-                    b.Property<bool>("Blocked")
-                        .HasColumnType("bit");
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
 
-                    b.Property<double>("DriverLatitude")
+                    b.Property<double?>("DriverLatitude")
                         .HasColumnType("float");
 
-                    b.Property<double>("DriverLongitude")
+                    b.Property<double?>("DriverLongitude")
                         .HasColumnType("float");
 
                     b.Property<string>("Email")

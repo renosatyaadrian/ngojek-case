@@ -1,5 +1,6 @@
 using DriverService.Data;
 using DriverService.Helper;
+using DriverService.SyncDataService.Http;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -59,6 +60,7 @@ namespace DriverService
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddScoped<IDriverRepo, DriverRepo>();
+            services.AddHttpClient<IDriverDataClient, HttpOrderDataClient>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 

@@ -27,6 +27,5 @@ namespace DriverService.Models
         public bool Blocked { get; set; }
         [Required]
         public DateTime CreatedDate { get; set; }
-        public ICollection<Order> Orders { get; set; }
     }
 }
