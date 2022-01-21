@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: driverapi-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: driverapiservice
+  template:
+    metadata:
+      labels:
+        app: driverapiservice
+    spec:
+      containers:
+      - name: driverapiservice
+        image: renosatyaadrians/driverservice:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: driverapi-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: driverapiservice
+  ports:
+  - name: driverapiservice
+    protocol: TCP
+    port: 80
+    targetPort: 80

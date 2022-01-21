@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: userapi-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: userapiservice
+  template:
+    metadata:
+      labels:
+        app: userapiservice
+    spec:
+      containers:
+      - name: userapiservice
+        image: renosatyaadrians/userservice:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: userapi-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: userapiservice
+  ports:
+  - name: userapiservice
+    protocol: TCP
+    port: 80
+    targetPort: 80
