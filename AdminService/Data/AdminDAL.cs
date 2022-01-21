@@ -205,9 +205,12 @@ namespace AdminService.Data
 
 
         //Driver
-        public Task<IEnumerable<Driver>> GetAllDriver()
+        public async Task<IEnumerable<Driver>> GetAllDriver()
         {
-            throw new NotImplementedException();
+            var results = await(from d in _dbContext.Drivers
+                                orderby d.FirstName ascending
+                                select d).ToListAsync();
+            return results;
         }
 
         public void ApproveDriver(int driverId)
@@ -221,9 +224,12 @@ namespace AdminService.Data
         }
 
         //User
-        public Task<IEnumerable<Customer>> GetAllCustomer()
+        public async Task<IEnumerable<Customer>> GetAllCustomer()
         {
-            throw new NotImplementedException();
+            var results = await(from c in _dbContext.Customers
+                                orderby c.FirstName ascending
+                                select c).ToListAsync();
+            return results;
         }
 
         public void BlockCustomer(int customerId)
@@ -237,18 +243,12 @@ namespace AdminService.Data
         }
 
         //Transaction
-        public async Task<IEnumerable<Order>> GetAllTransactions()
+        public async Task<IEnumerable<Order>> GetAllTransaction()
         {
-            var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
-            Console.WriteLine(username);
-            var transaction = await _dbContext.Orders.ToListAsync();
-            if (transaction == null) throw new ArgumentNullException(username);
-            return transaction;
-        }
-
-        public Task<IEnumerable<Order>> GetAllTransaction()
-        {
-            throw new NotImplementedException();
+            var results = await (from o in _dbContext.Orders
+                                 orderby o.Id ascending
+                                 select o).ToListAsync();
+            return results;
         }
 
         public Task<ConfigApp> GetPriceById(int Id)

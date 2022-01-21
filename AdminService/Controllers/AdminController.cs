@@ -71,10 +71,13 @@ namespace AdminService.Controllers
         {
             try
             {
-                var customer = await _admin.GetAllDriver();
-                return Ok(customer);
+                Console.WriteLine($"--> Admin Get All Driver <--");
+
+                var driver = await _admin.GetAllDriver();
+                var dtos = _mapper.Map<IEnumerable<DriverDto>>(driver);
+                return Ok(dtos);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex);
                 return BadRequest(ex.Message);
@@ -87,10 +90,13 @@ namespace AdminService.Controllers
         {
             try
             {
+                Console.WriteLine($"--> Admin Get All Customer <--");
+
                 var customer = await _admin.GetAllCustomer();
-                return Ok(customer);
+                var dtos = _mapper.Map<IEnumerable<CustomerDto>>(customer);
+                return Ok(dtos);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex);
                 return BadRequest(ex.Message);
@@ -103,8 +109,11 @@ namespace AdminService.Controllers
         {
             try
             {
-                var customer = await _admin.GetAllTransaction();
-                return Ok(customer);
+                Console.WriteLine($"--> Admin Get All Transaction <--");
+
+                var order = await _admin.GetAllTransaction();
+                var dtos = _mapper.Map<IEnumerable<OrderDto>>(order);
+                return Ok(dtos);
             }
             catch (Exception ex)
             {
