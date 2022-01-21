@@ -11,7 +11,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using OrderService.Configs;
 using OrderService.Data;
 using OrderService.Helpers;
 using OrderService.KafkaHandler;
@@ -52,10 +51,8 @@ namespace OrderService
             }
 
             services.AddScoped<IOrder,OrderDAL>();
-
+            services.AddScoped<IUser, UserDAL>();
             services.AddScoped<IDriverRepo, DriverRepo>();
-            
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
