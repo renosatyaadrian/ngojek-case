@@ -215,12 +215,30 @@ namespace AdminService.Data
 
         public void ApproveDriver(int driverId)
         {
-            throw new NotImplementedException();
+            var result = _dbContext.Drivers.FirstOrDefault(drv => drv.Id == driverId);
+
+            if (result == null)
+            {
+                throw new Exception($"Driver id {result.Id} tidak di temukan");
+            }
+
+            result.Id = driverId;
+            result.Blocked = false;
+            _dbContext.SaveChanges();
         }
 
         public void BlockDriver(int driverId)
         {
-            throw new NotImplementedException();
+            var result = _dbContext.Drivers.FirstOrDefault(drv => drv.Id == driverId);
+
+            if (result == null)
+            {
+                throw new Exception($"Driver id {result.Id} tidak di temukan");
+            }
+
+            result.Id = driverId;
+            result.Blocked = true;
+            _dbContext.SaveChanges();
         }
 
         //User

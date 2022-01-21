@@ -84,6 +84,42 @@ namespace AdminService.Controllers
             }
         }
 
+        [HttpPut("ApproveDriver")]
+        public ActionResult ApproveDriver(int driverId)
+        {
+            try
+            {
+                Console.WriteLine($"--> Admin Accepting Driver Id : {driverId} <--");
+
+                _admin.ApproveDriver(driverId);
+                _admin.SaveChanges();
+
+                return Ok("Driver Has Been Accepted");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("BlockDriver")]
+        public ActionResult BlockDriver(int driverId)
+        {
+            try
+            {
+                Console.WriteLine($"--> Admin Blocking Driver Id : {driverId}  <--");
+
+                _admin.BlockDriver(driverId);
+                _admin.SaveChanges();
+
+                return Ok("Driver Has Been Blocked");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         //Customer
         [HttpGet("Customer")]
         public async Task<ActionResult<IEnumerable<CustomerDto>>> GetCustomer()
