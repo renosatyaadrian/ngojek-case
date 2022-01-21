@@ -244,20 +244,38 @@ namespace AdminService.Data
         //User
         public async Task<IEnumerable<Customer>> GetAllCustomer()
         {
-            var results = await(from c in _dbContext.Customers
-                                orderby c.FirstName ascending
-                                select c).ToListAsync();
+            var results = await (from c in _dbContext.Customers
+                                 orderby c.FirstName ascending
+                                 select c).ToListAsync();
             return results;
         }
 
         public void BlockCustomer(int customerId)
         {
-            throw new NotImplementedException();
+            var result = _dbContext.Customers.FirstOrDefault(cust => cust.Id == customerId);
+
+            if (result == null)
+            {
+                throw new Exception($"Customer id {result.Id} tidak di temukan");
+            }
+
+            result.Id = customerId;
+            result.Blocked = true;
+            _dbContext.SaveChanges();
         }
 
         public void UnblockCustomer(int customerId)
         {
-            throw new NotImplementedException();
+            var result = _dbContext.Customers.FirstOrDefault(cust => cust.Id == customerId);
+
+            if (result == null)
+            {
+                throw new Exception($"Customer id {result.Id} tidak di temukan");
+            }
+
+            result.Id = customerId;
+            result.Blocked = false;
+            _dbContext.SaveChanges();
         }
 
         //Transaction

@@ -139,6 +139,42 @@ namespace AdminService.Controllers
             }
         }
 
+        [HttpPut("BlockUser")]
+        public ActionResult BlockCustomer(int customerId)
+        {
+            try
+            {
+                Console.WriteLine($"--> Admin Blocking Customer Id : {customerId}  <--");
+
+                _admin.BlockCustomer(customerId);
+                _admin.SaveChanges();
+
+                return Ok("Customer Has Been Blocked");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("UnlockUser")]
+        public ActionResult UnlockCustomer(int customerId)
+        {
+            try
+            {
+                Console.WriteLine($"--> Admin Blocking Customer Id : {customerId}  <--");
+
+                _admin.UnblockCustomer(customerId);
+                _admin.SaveChanges();
+
+                return Ok("Customer Has Been Unblocked");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         //Transaction
         [HttpGet("Transaction")]
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetTransaction()
