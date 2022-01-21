@@ -193,5 +193,52 @@ namespace AdminService.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("GetPriceById")]
+        public async Task<ActionResult<ConfigApp>> Get(int id)
+        {
+            Console.WriteLine($"--> Admin Get Price By Id : {id} <--");
+
+            var result = await _admin.GetPriceById(id);
+            if (result == null)
+                return NotFound();
+            return Ok(_mapper.Map<SetPriceDto>(result));
+        }
+
+        [HttpPost("PricePerKM")]
+        public async Task<ActionResult<ConfigApp>> Post([FromBody] SetPriceCreateDto setPriceCreateDto)
+        {
+            try
+            {
+                Console.WriteLine($"--> Admin Set Price Per KM <--");
+
+                var price = _mapper.Map<ConfigApp>(setPriceCreateDto);
+                var result = await _admin.SetPricePerKM(price);
+                var priceReturn = _mapper.Map<ConfigApp>(result);
+                return Ok(priceReturn);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("PricePerKM")]
+        public async Task<ActionResult<ConfigApp>> Put(int id, [FromBody] SetPriceCreateDto setPriceCreateDto)
+        {
+            try
+            {
+                Console.WriteLine($"--> Admin Update Price Per KM <--");
+
+                var price = _mapper.Map<ConfigApp>(setPriceCreateDto);
+                var result = await _admin.UpdatePricePerKM(id, price);
+                var priceReturn = _mapper.Map<ConfigApp>(result);
+                return Ok(priceReturn);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

@@ -287,19 +287,43 @@ namespace AdminService.Data
             return results;
         }
 
-        public Task<ConfigApp> GetPriceById(int Id)
+        public async Task<ConfigApp> GetPriceById(int Id)
         {
-            throw new NotImplementedException();
+            var result = await _dbContext.ConfigApps.Where(s => s.Id == Id).SingleOrDefaultAsync();
+            if (result != null)
+                return result;
+            else
+                throw new Exception("Data tidak ditemukan !");
         }
 
-        public Task<ConfigApp> SetPricePerKM(ConfigApp configApp)
+        public async Task<ConfigApp> SetPricePerKM(ConfigApp configApp)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _dbContext.ConfigApps.Add(configApp);
+                await _dbContext.SaveChangesAsync();
+                return configApp;
+            }
+            catch (DbUpdateException dbEx)
+            {
+                throw new Exception($"Error: {dbEx.Message}");
+            }
         }
 
-        public Task<ConfigApp> UpdatePricePerKM(int Id, ConfigApp configApp)
+        public async Task<ConfigApp> UpdatePricePerKM(int Id, ConfigApp configApp)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await GetPriceById(Id);
+                result.PricePerKM = configApp.PricePerKM;
+                await _dbContext.SaveChangesAsync();
+                configApp.Id = Id;
+                return configApp;
+            }
+            catch (DbUpdateException dbEx)
+            {
+                throw new Exception($"Error: {dbEx.Message}");
+            }
         }
     }
 }
