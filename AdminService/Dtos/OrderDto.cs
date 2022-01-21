@@ -2,6 +2,7 @@
 {
     public class OrderDto
     {
+        public int DriverId { get; set; }
         public int CustomerId { get; set; }
         public double? Price { get; set; }
         public float? Distance { get; set; }
