@@ -11,7 +11,6 @@ namespace DriverService.Data
         }
 
         public DbSet<Driver> Drivers { get; set; }
-        public DbSet<Order> Orders { get; set; }
 
     }
 }

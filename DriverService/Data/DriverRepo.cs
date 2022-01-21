@@ -1,6 +1,7 @@
 ﻿using DriverService.Dtos;
 using DriverService.Helper;
 using DriverService.Models;
+using DriverService.SyncDataService.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -22,17 +23,20 @@ namespace DriverService.Data
         private UserManager<IdentityUser> _userManager;
         private RoleManager<IdentityRole> _roleManager;
         private AppSettings _appSettings;
+        private readonly IDriverDataClient _driverDataClient;
         public DriverRepo(ApplicationDbContext context, 
                           IHttpContextAccessor httpContextAccessor, 
                           UserManager<IdentityUser> userManager, 
                           RoleManager<IdentityRole> roleManager, 
-                          IOptions<AppSettings> appSetings)
+                          IOptions<AppSettings> appSetings,
+                          IDriverDataClient driverDataClient)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
             _roleManager = roleManager;
             _appSettings = appSetings.Value;
+            _driverDataClient = driverDataClient;
         }
 
         public bool SaveChanges()
@@ -181,67 +185,38 @@ namespace DriverService.Data
             result.DriverLatitude = obj.DriverLatitude;
             _context.SaveChanges();
         }
-        public void CreateDriver(Driver driver)
-        {
-            if (driver == null)
-            {
-                throw new ArgumentNullException(nameof(driver));
-            }
-            _context.Drivers.Add(driver);
-        }
 
         //Order
-        public IEnumerable<Order> GetAllOrders()
+        public IEnumerable<OrderDto> GetAllOrders()
         {
-            var userName = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
-            var driver = _context.Drivers.FirstOrDefault(dri => dri.Username == userName);
-            var order = _context.Orders.FirstOrDefault();
+            var order = _driverDataClient.GetOrderFromOrderService();
 
-            if (MathHelper.getDistanceFromLatLonInKm((double)driver.DriverLatitude, (double)driver.DriverLongitude, order.UserLatitude, order.UserLongitude) <= 5 && order.PickedUp.Equals(false) && order.Completed.Equals(false)) 
-            {
-                return _context.Orders.ToList();
-            }
-            else
-            {
-                throw new Exception("Tidak ada orderan di dekat anda");
-            }
+            return (IEnumerable<OrderDto>)order;
         }
-        public Order GetHistoryOrder()
+        public IEnumerable<OrderDto> GetHistoryOrder()
         {
-            var userName = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
-            var driver = _context.Drivers.FirstOrDefault(dri => dri.Username == userName);
-            return _context.Orders.FirstOrDefault(ord => ord.DriverId == driver.Id);
+            var order = _driverDataClient.GetHistoryOrderFromOrderService();
+
+            return (IEnumerable<OrderDto>)order;
         }
         public void AcceptOrder(int custId)
         {
-            var userName = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
-            var driver = _context.Drivers.FirstOrDefault(dri => dri.Username == userName);
-            var result = _context.Orders.FirstOrDefault(ord => ord.CustomerId == custId);
+            var result = _driverDataClient.AcceptOrderToOrderService(custId);
 
             if (result == null)
             {
-                throw new Exception($"Order id {result.Id} tidak di temukan");
+                throw new Exception($"Order dengan Customer Id: {custId} tidak di temukan");
             }
-
-            result.DriverId = driver.Id;
-            result.PickedUp = true;
-            _context.SaveChanges();
         }
 
         public void FinishOrder(int custId)
         {
-            var userName = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
-            var driver = _context.Drivers.FirstOrDefault(dri => dri.Username == userName);
-            var result = _context.Orders.FirstOrDefault(ord => ord.CustomerId == custId);
+            var result = _driverDataClient.AcceptOrderToOrderService(custId);
 
             if (result == null)
             {
-                throw new Exception($"Order id {result.Id} tidak di temukan");
+                throw new Exception($"Order id {custId} tidak di temukan");
             }
-
-            result.Completed = true;
-            driver.Balance += (double)result.Price;
-            _context.SaveChanges();
         }
     }
 }

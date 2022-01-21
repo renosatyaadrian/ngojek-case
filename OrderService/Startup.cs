@@ -38,12 +38,12 @@ namespace OrderService
             services.AddDbContext<AppDbContext>(options => 
             options.UseSqlServer(Configuration.GetConnectionString("LocalSQLEdge")));
             
-            // services dal
-            services.AddScoped<IOrder, OrderDAL>();
-            services.AddScoped<IUser, UserDAL>();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<IOrder,OrderDAL>();
+
+            services.AddScoped<IDriverRepo, DriverRepo>();
             
-            // auto mapper
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddControllers().AddNewtonsoftJson(options=>
             options.SerializerSettings.ReferenceLoopHandling=Newtonsoft.Json.ReferenceLoopHandling.Ignore);
