@@ -48,8 +48,15 @@ namespace UserService
                 options.Password.RequireDigit = true;
             }).AddDefaultTokenProviders().AddEntityFrameworkStores<AppDbContext>();
 
+            var kafkaSettingsSection = Configuration.GetSection("KafkaSettings");
+            services.Configure<KafkaSettings>(kafkaSettingsSection);
+
+            var httpClientSettingsSection = Configuration.GetSection("OrderService");
+            services.Configure<HttpClientSettings>(httpClientSettingsSection);
+
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
+
             var appSettings = appSettingsSection.Get<AppSettings>();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
             services.AddAuthentication(x =>
@@ -72,9 +79,7 @@ namespace UserService
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddScoped<IUser, UserDAL>();
-            services.AddScoped<IOrder, OrderDAL>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddHttpContextAccessor();
             services.AddHttpClient<IOrderDataClient, HttpOrderDataClient>();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

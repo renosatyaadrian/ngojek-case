@@ -104,6 +104,7 @@ namespace UserService.Data
             var cust = await _dbContext.Customers.Where(u => u.Username == username && u.Blocked.Equals(false)).SingleOrDefaultAsync();
             var configApp = await _dbContext.ConfigApps.Where(conf => conf.Id == 1).FirstOrDefaultAsync();
             var price = roundedDistance * configApp.PricePerKM;
+            if(cust.Balance<price) throw new Exception("Mohon topup terlebih dahulu");
             try
             {
                 var order = new Order()
@@ -184,6 +185,14 @@ namespace UserService.Data
 
                 _dbContext.Customers.Add(userEntity);
                 await _dbContext.SaveChangesAsync();
+
+                var key = "user-create-" + DateTime.Now.ToString();
+                var val = JObject.FromObject(userEntity, new JsonSerializer()
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                    }).ToString(Formatting.None);
+                string topic = "user-add";
+                await KafkaHelper.SendKafkaAsync(_kafkaSettings, topic, key, val);
             }
             catch (Exception ex)
             {
