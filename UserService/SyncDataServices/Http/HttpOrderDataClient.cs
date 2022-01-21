@@ -8,8 +8,10 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using UserService.Dtos;
+using UserService.Helper;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace UserService.SyncDataServices.Http
@@ -17,17 +19,17 @@ namespace UserService.SyncDataServices.Http
     public class HttpOrderDataClient : IOrderDataClient
     {
         private readonly HttpClient _httpClient;
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<HttpClientSettings> _httpClientSettings;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public HttpOrderDataClient()
         {
         }
 
-        public HttpOrderDataClient(HttpClient httpClient, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public HttpOrderDataClient(HttpClient httpClient, IOptions<HttpClientSettings> httpClientSettings, IHttpContextAccessor httpContextAccessor)
         {
             _httpClient = httpClient;
-            _configuration = configuration;
+            _httpClientSettings = httpClientSettings;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -36,9 +38,10 @@ namespace UserService.SyncDataServices.Http
             string tokenHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"];
             string token = tokenHeader.Substring("Bearer ".Length).Trim();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            HttpResponseMessage response = await _httpClient.GetAsync(
-                $"http://localhost:7000/api/User/{id}/Order/{orderId}");
-            // var response = await _httpClient.PostAsync(_configuration.GetSection("OrderService").GetValue<string>("GetUserOrderById"), httpContent);
+
+            string reqUri = _httpClientSettings.Value.UserController.ToString() + $"/{id}/Order/{orderId}";
+
+            HttpResponseMessage response = await _httpClient.GetAsync(reqUri);
             response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
             OrderDto orderDto = JsonConvert.DeserializeObject<OrderDto>(responseBody);
@@ -59,9 +62,10 @@ namespace UserService.SyncDataServices.Http
             string token = tokenHeader.Substring("Bearer ".Length).Trim();
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            HttpResponseMessage response = await _httpClient.GetAsync(
-                $"http://localhost:7000/api/User/{id}/Orders");
-            // var response = await _httpClient.PostAsync(_configuration.GetSection("OrderService").GetValue<string>("GetUserOrderById"), httpContent);
+            
+            string reqUri = _httpClientSettings.Value.UserController.ToString() + $"/{id}/Orders";
+
+            HttpResponseMessage response = await _httpClient.GetAsync(reqUri);
             response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
             IEnumerable<OrderDto> orderDtos = JsonConvert.DeserializeObject<IEnumerable<OrderDto>>(responseBody);
