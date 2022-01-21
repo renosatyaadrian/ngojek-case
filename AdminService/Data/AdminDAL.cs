@@ -59,7 +59,9 @@ namespace AdminService.Data
 
                 List<Claim> claims = new List<Claim>();
                 claims.Add(new Claim(ClaimTypes.Name, user.Username));
-                var roles = await GetRolesFromUser(username);
+                var result = await _userManager.FindByEmailAsync(username);
+                var roles = await _userManager.GetRolesAsync(result);
+
                 foreach (var role in roles)
                 {
                     claims.Add(new Claim(ClaimTypes.Role, role));
@@ -104,7 +106,6 @@ namespace AdminService.Data
                     throw new Exception("Gagal Menambahkan User");
                 }
                 var userResult = await _userManager.FindByNameAsync(newUser.Email);
-                await _userManager.AddToRoleAsync(userResult, "Driver");
 
                 var userEntity = new Admin
                 {

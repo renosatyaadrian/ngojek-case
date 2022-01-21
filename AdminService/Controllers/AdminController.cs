@@ -3,6 +3,7 @@ using AdminService.Dtos;
 using AdminService.Helper;
 using AdminService.Models;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -12,8 +13,9 @@ using System.Threading.Tasks;
 
 namespace AdminService.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     [ApiController]
+    [Route("api/[controller]")]
     public class AdminController : Controller
     {
         private UserManager<IdentityUser> _userManager;
@@ -33,11 +35,14 @@ namespace AdminService.Controllers
 
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult> Registration([FromBody] AdminCreateDto adminCreateDto)
         {
             try
             {
+                Console.WriteLine($"--> Register Admin <--");
+
                 await _admin.Registration(adminCreateDto);
                 await _admin.AddRoleForUser(adminCreateDto.Username, "Admin");
 
@@ -49,11 +54,14 @@ namespace AdminService.Controllers
             }
         }
 
-        [HttpPost("Login")]
+        [AllowAnonymous]
+        [HttpPost("Authentication")]
         public async Task<ActionResult<User>> Authentication(LoginInput input)
         {
             try
             {
+                Console.WriteLine($"--> Authentication Admin <--");
+
                 var user = await _admin.Authenticate(input.Username, input.Password);
                 if (user == null) return BadRequest("username/password tidak tepat");
                 return Ok(user);
