@@ -26,9 +26,11 @@ namespace UserService
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IWebHostEnvironment _env;
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            _env = env;
         }
 
         public IConfiguration Configuration { get; }
@@ -36,9 +38,21 @@ namespace UserService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<AppDbContext>(options => 
-            options.UseSqlServer(Configuration.GetConnectionString("LocalSQLEdge")));
-            
+            if (_env.IsProduction())
+            {
+                Console.WriteLine("--> using sql server db");
+                services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(
+                    Configuration.GetConnectionString("AzureConnection")
+                ));
+            }
+            else
+            {
+                Console.WriteLine("--> using local sql server db");
+                services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(
+                    Configuration.GetConnectionString("LocalSQLEdge")
+                ));
+            }
+
             services.AddAuthorization(); 
             services.AddIdentity<IdentityUser,IdentityRole>(options => {
                 options.Password.RequiredLength = 8;
