@@ -1,7 +1,6 @@
 ﻿using AdminService.Dtos;
 using AdminService.Helper;
 using AdminService.Models;
-using DriverService.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -91,23 +90,37 @@ namespace AdminService.Data
         {
             try
             {
-                var newUser = new IdentityUser { UserName = adminCreateDto.Username, Email = adminCreateDto.Email };
-                var result = await _userManager.CreateAsync(newUser, adminCreateDto.Password);
+                var newUser = new IdentityUser
+                {
+                    UserName = adminCreateDto.Username,
+                    Email = adminCreateDto.Username
 
+                };
+
+                var result = await _userManager.CreateAsync(newUser, adminCreateDto.Password);
 
                 if (!result.Succeeded)
                 {
-                    StringBuilder errMsg = new StringBuilder(String.Empty);
-                    foreach (var err in result.Errors)
-                    {
-                        errMsg.Append(err.Description + " ");
-                    }
-                    throw new Exception($"{errMsg}");
+                    throw new Exception("Gagal Menambahkan User");
                 }
+                var userResult = await _userManager.FindByNameAsync(newUser.Email);
+                await _userManager.AddToRoleAsync(userResult, "Driver");
+
+                var userEntity = new Admin
+                {
+                    Username = adminCreateDto.Username,
+                    FullName = adminCreateDto.Fullname,
+                    Email = adminCreateDto.Email
+                };
+
+                Console.WriteLine(userEntity);
+
+                _dbContext.Admins.Add(userEntity);
+                await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                throw new Exception($"{ex.Message}");
+                throw new Exception($"Error: {ex.Message}");
             }
         }
 
@@ -192,20 +205,35 @@ namespace AdminService.Data
 
 
         //Driver
-        public Task<Driver> ApproveDriver(string driverId, Driver driver)
+        public Task<IEnumerable<Driver>> GetAllDriver()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
-        public Task<Driver> BlockDriver(string driverId, Driver driver)
+        public void ApproveDriver(int driverId)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
+        }
+
+        public void BlockDriver(int driverId)
+        {
+            throw new NotImplementedException();
         }
 
         //User
-        public Task<User> BlockUsere(string userId, User user)
+        public Task<IEnumerable<Customer>> GetAllCustomer()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
+        }
+
+        public void BlockCustomer(int customerId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UnblockCustomer(int customerId)
+        {
+            throw new NotImplementedException();
         }
 
         //Transaction
@@ -218,11 +246,24 @@ namespace AdminService.Data
             return transaction;
         }
 
-
-        public Task<ConfigApp> SetPricePerKM(string id, ConfigApp configApp)
+        public Task<IEnumerable<Order>> GetAllTransaction()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
+        public Task<ConfigApp> GetPriceById(int Id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ConfigApp> SetPricePerKM(ConfigApp configApp)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ConfigApp> UpdatePricePerKM(int Id, ConfigApp configApp)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

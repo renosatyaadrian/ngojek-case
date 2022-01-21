@@ -17,14 +17,19 @@ namespace AdminService.Data
             Task<User> Authenticate(string username, string password);
 
             //Driver
-            Task<Driver> ApproveDriver(string driverId, Driver driver);
-            Task<Driver> BlockDriver(string driverId, Driver driver);
+            Task<IEnumerable<Driver>> GetAllDriver();
+            void ApproveDriver(int driverId);
+            void BlockDriver(int driverId);
 
             //User
-            Task<User> BlockUsere(string userId, User user);
+            Task<IEnumerable<Customer>> GetAllCustomer();
+            void BlockCustomer(int customerId);
+            void UnblockCustomer(int customerId);
 
             //Transaction
-            Task <IEnumerable<Order>> GetAllTransactions();
-            Task<ConfigApp> SetPricePerKM(string id, ConfigApp configApp);
+            Task<IEnumerable<Order>> GetAllTransaction();
+            Task<ConfigApp> GetPriceById(int Id);
+            Task<ConfigApp> SetPricePerKM(ConfigApp configApp);
+            Task<ConfigApp> UpdatePricePerKM(int Id, ConfigApp configApp);
     }
 }

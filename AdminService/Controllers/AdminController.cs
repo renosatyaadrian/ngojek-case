@@ -2,9 +2,7 @@
 using AdminService.Dtos;
 using AdminService.Helper;
 using AdminService.Models;
-using AdminService.SyncDataServices.Http;
 using AutoMapper;
-using DriverService.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -18,7 +16,6 @@ namespace AdminService.Controllers
     [ApiController]
     public class AdminController : Controller
     {
-        private IAdminDataClient _dataClient;
         private UserManager<IdentityUser> _userManager;
         private RoleManager<IdentityRole> _roleManager;
         private AppSettings _appSettings;
@@ -26,11 +23,10 @@ namespace AdminService.Controllers
         private IAdmin _admin;
 
         public AdminController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager,
-            IMapper mapper, IAdmin admin, IAdminDataClient dataClient, IOptions<AppSettings> appSettings)
+            IMapper mapper, IAdmin admin, IOptions<AppSettings> appSettings)
         {
             _mapper = mapper;
             _admin = admin;
-            _dataClient = dataClient;
             _userManager = userManager;
             _roleManager = roleManager;
             _appSettings = appSettings.Value;
@@ -75,7 +71,7 @@ namespace AdminService.Controllers
         {
             try
             {
-                var customer = await _dataClient.GetDriver();
+                var customer = await _admin.GetAllDriver();
                 return Ok(customer);
             }
             catch (System.Exception ex)
@@ -91,7 +87,7 @@ namespace AdminService.Controllers
         {
             try
             {
-                var customer = await _dataClient.GetCustomer();
+                var customer = await _admin.GetAllCustomer();
                 return Ok(customer);
             }
             catch (System.Exception ex)
@@ -107,7 +103,7 @@ namespace AdminService.Controllers
         {
             try
             {
-                var customer = await _dataClient.GetTransaction();
+                var customer = await _admin.GetAllTransaction();
                 return Ok(customer);
             }
             catch (Exception ex)
