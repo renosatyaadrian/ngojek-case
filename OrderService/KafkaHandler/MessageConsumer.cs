@@ -38,6 +38,7 @@ namespace OrderService.KafkaHandler
             };
             var topics = new List<String>();
             topics.Add("order-add");
+            topics.Add("user-add");
             foreach(var topic in topics)
             {
                 using (var adminClient = new AdminClientBuilder(producerConfig).Build())
@@ -104,6 +105,11 @@ namespace OrderService.KafkaHandler
                                     Completed = orderDto.Completed
                                 };
                                 dbcontext.Orders.Add(order);
+                                break;
+                                case "user-add":
+                                Console.WriteLine(cr.Topic);
+                                Customer customer = JsonConvert.DeserializeObject<Customer>(cr.Message.Value);
+                                dbcontext.Customers.Add(customer);
                                 break;
                             }
                             await dbcontext.SaveChangesAsync();
