@@ -54,8 +54,6 @@ namespace OrderService
             services.AddScoped<IOrder,OrderDAL>();
 
             services.AddScoped<IDriverRepo, DriverRepo>();
-            
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
