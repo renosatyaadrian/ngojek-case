@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace OrderService.Helpers
 {
-    public class MathHelper
+    public static class MathHelper
     {
         public static float getDistanceFromLatLonInKm(double lat1, double lon1, double lat2, double lon2)
         {

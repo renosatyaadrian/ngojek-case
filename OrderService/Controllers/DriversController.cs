@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OrderService.Data;
@@ -22,6 +23,7 @@ namespace OrderService.Controllers
             _mapper = mapper;
         }
 
+        [AllowAnonymous]
         [HttpPost("Driver")]
         public ActionResult<DriverDto> CreateDriver(DriverForCreateDto driverForCreateDto)
         {
@@ -53,6 +55,7 @@ namespace OrderService.Controllers
             }
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Driver")]
         [HttpPut("Position")]
         public ActionResult<DriverDto> SetPosition(SetPositionDto setPositionDto)
         {
@@ -65,7 +68,7 @@ namespace OrderService.Controllers
 
                 if (drivermodel != null)
                 {
-                    return Ok(drivermodel);
+                    return Ok($"Set Position Driver, Lat: {setPositionDto.DriverLatitude}, Long: {setPositionDto.DriverLongitude} Telah Berhasil");
                 }
                 return NotFound();
             }
@@ -75,14 +78,15 @@ namespace OrderService.Controllers
             }
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Driver")]
         [HttpGet("Order")]
-        public ActionResult<IEnumerable<ReadOrderDto>> GetAllOrders()
+        public ActionResult<IEnumerable<OrderDto>> GetAllOrders()
         {
             try
             {
-                Console.WriteLine("--> Getting Enrollments .....");
+                Console.WriteLine("--> Getting Order .....");
                 var orderitem = _repository.GetAllOrders();
-                return Ok(_mapper.Map<IEnumerable<ReadOrderDto>>(orderitem));
+                return Ok(_mapper.Map<IEnumerable<OrderDto>>(orderitem));
             }
             catch (Exception ex)
             {
@@ -90,16 +94,17 @@ namespace OrderService.Controllers
             }
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Driver")]
         [HttpGet("History")]
-        public ActionResult<ReadOrderDto> GetHistoryOrder()
+        public ActionResult<IEnumerable<OrderDto>> GetHistoryOrder()
         {
             try
             {
-                Console.WriteLine($"--> Getting History Driver With Id: {_repository.GetHistoryOrder().DriverId} .....");
+                Console.WriteLine($"--> Getting History Driver .....");
                 var orderitem = _repository.GetHistoryOrder();
                 if (orderitem != null)
                 {
-                    return Ok(_mapper.Map<ReadOrderDto>(orderitem));
+                    return Ok(_mapper.Map<IEnumerable<OrderDto>>(orderitem));
                 }
                 return NotFound();
             }
@@ -109,14 +114,15 @@ namespace OrderService.Controllers
             }
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Driver")]
         [HttpPut("Accept")]
-        public ActionResult AcceptOrder(int custId)
+        public ActionResult AcceptOrder(CustIdDto custIdDto)
         {
             try
             {
-                Console.WriteLine($"--> Driver Accepting Order With Customer Id: {custId}.....");
+                Console.WriteLine($"--> Driver Accepting Order With Customer Id: {custIdDto.CustomerId}.....");
 
-                _repository.AcceptOrder(custId);
+                _repository.AcceptOrder(custIdDto);
                 _repository.SaveChanges();
 
                 return Ok("Order Has Been Accepted");
@@ -127,17 +133,38 @@ namespace OrderService.Controllers
             }
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Driver")]
         [HttpPut("Finish")]
-        public ActionResult FinishOrder(int custId)
+        public ActionResult FinishOrder(CustIdDto custIdDto)
         {
             try
             {
-                Console.WriteLine($"--> Driver Accepting Order With Customer Id: {custId}.....");
+                Console.WriteLine($"--> Driver Finishing Order With Customer Id: {custIdDto.CustomerId}.....");
 
-                _repository.FinishOrder(custId);
+                _repository.FinishOrder(custIdDto);
                 _repository.SaveChanges();
 
                 return Ok("Order Has Been Finished");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Driver")]
+        [HttpGet("Saldo")]
+        public ActionResult<ReadSaldoDto> ShowSaldo()
+        {
+            try
+            {
+                Console.WriteLine($"--> Getting Balance Driver: {_repository.ShowSaldo().Balance} .....");
+                var driveritem = _repository.ShowSaldo();
+                if (driveritem != null)
+                {
+                    return Ok(_mapper.Map<ReadSaldoDto>(driveritem));
+                }
+                return NotFound();
             }
             catch (Exception ex)
             {

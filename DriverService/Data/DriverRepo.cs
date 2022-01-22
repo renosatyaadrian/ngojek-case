@@ -128,6 +128,8 @@ namespace DriverService.Data
                         LastName = driverForCreateDto.LastName,
                         PhoneNumber = driverForCreateDto.PhoneNumber,
                         Email = driverForCreateDto.Email,
+                        DriverLatitude = 0,
+                        DriverLongitude = 0,
                         Balance = 0,
                         CreatedDate = DateTime.Now,
                         Blocked = true
@@ -135,8 +137,8 @@ namespace DriverService.Data
 
                     Console.WriteLine(userEntity);
 
-                    _context.Drivers.Add(userEntity);
-                    await _context.SaveChangesAsync();
+                    CreateDriver(userEntity);
+                    SaveChanges();
                 }
                 else
                 {
@@ -172,6 +174,15 @@ namespace DriverService.Data
             }
         }
 
+        public void CreateDriver(Driver driver)
+        {
+            if (driver == null)
+            {
+                throw new ArgumentNullException(nameof(driver));
+            }
+            _context.Drivers.Add(driver);
+        }
+
         public async Task AddRole(string rolename)
         {
             try
@@ -195,17 +206,20 @@ namespace DriverService.Data
         public Driver ShowProfile()
         {
             var userName = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
+            if (userName == null)
+            {
+                throw new Exception("Silahkan Login Terlebih Dahulu");
+            }
             return _context.Drivers.FirstOrDefault(dri => dri.Username == userName);
         }
 
-        public Driver ShowSaldo()
-        {
-            var userName = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
-            return _context.Drivers.FirstOrDefault(dri => dri.Username == userName);
-        }
         public void SetPosition(Driver obj)
         {
             var userName = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
+            if (userName == null)
+            {
+                throw new Exception("Silahkan Login Terlebih Dahulu");
+            }
             var result = _context.Drivers.FirstOrDefault(dri => dri.Username == userName);
 
             result.DriverLongitude = obj.DriverLongitude;
@@ -214,35 +228,23 @@ namespace DriverService.Data
         }
 
         //Order
-        public IEnumerable<OrderDto> GetAllOrders()
+        public void AcceptOrder(CustIdDto custIdDto)
         {
-            var order = _driverDataClient.GetOrderFromOrderService();
-
-            return (IEnumerable<OrderDto>)order;
-        }
-        public IEnumerable<OrderDto> GetHistoryOrder()
-        {
-            var order = _driverDataClient.GetHistoryOrderFromOrderService();
-
-            return (IEnumerable<OrderDto>)order;
-        }
-        public void AcceptOrder(int custId)
-        {
-            var result = _driverDataClient.AcceptOrderToOrderService(custId);
+            var result = _driverDataClient.AcceptOrderToOrderService(custIdDto);
 
             if (result == null)
             {
-                throw new Exception($"Order dengan Customer Id: {custId} tidak di temukan");
+                throw new Exception($"Order dengan Customer Id: {custIdDto.CustomerId} tidak di temukan");
             }
         }
 
-        public void FinishOrder(int custId)
+        public void FinishOrder(CustIdDto custIdDto)
         {
-            var result = _driverDataClient.AcceptOrderToOrderService(custId);
+            var result = _driverDataClient.FinishOrderToOrderService(custIdDto);
 
             if (result == null)
             {
-                throw new Exception($"Order id {custId} tidak di temukan");
+                throw new Exception($"Order id {custIdDto.CustomerId} tidak di temukan");
             }
         }
     }

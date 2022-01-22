@@ -1,4 +1,5 @@
 ﻿using DriverService.Dtos;
+using DriverService.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,10 +8,11 @@ namespace DriverService.SyncDataService.Http
     public interface IDriverDataClient
     {
         Task SendDriverToOrderService(DriverForSendHttpDto driverForSendHttp);
-        Task SetPositionToOrderServicee(SetPositionDto setPositionDto);
-        Task <IEnumerable<OrderDto>> GetOrderFromOrderService();
+        Task SetPositionToOrderServicee(Driver driver);
+        Task<IEnumerable<OrderDto>> GetOrderFromOrderService();
         Task <IEnumerable<OrderDto>> GetHistoryOrderFromOrderService();
-        Task AcceptOrderToOrderService(int custId);
-        Task FinishOrderToOrderService(int custId);
+        Task <ReadSaldoDto> GetSaldoDriver();
+        Task AcceptOrderToOrderService(CustIdDto custIdDto);
+        Task FinishOrderToOrderService(CustIdDto custIdDto);
     }
 }

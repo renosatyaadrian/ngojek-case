@@ -56,9 +56,9 @@ namespace DriverService.Migrations
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhoneNumber = table.Column<int>(type: "int", nullable: false),
-                    DriverLatitude = table.Column<double>(type: "float", nullable: true),
-                    DriverLongitude = table.Column<double>(type: "float", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DriverLatitude = table.Column<double>(type: "float", nullable: false),
+                    DriverLongitude = table.Column<double>(type: "float", nullable: false),
                     Balance = table.Column<double>(type: "float", nullable: false),
                     Blocked = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)

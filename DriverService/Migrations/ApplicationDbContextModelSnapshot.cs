@@ -35,10 +35,10 @@ namespace DriverService.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<double?>("DriverLatitude")
+                    b.Property<double>("DriverLatitude")
                         .HasColumnType("float");
 
-                    b.Property<double?>("DriverLongitude")
+                    b.Property<double>("DriverLongitude")
                         .HasColumnType("float");
 
                     b.Property<string>("Email")
@@ -53,8 +53,9 @@ namespace DriverService.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PhoneNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Username")
                         .IsRequired()
