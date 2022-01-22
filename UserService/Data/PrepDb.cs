@@ -38,8 +38,8 @@ namespace UserService.Data
             {
                 Console.WriteLine("--> Seeding data Customers -->");
                 context.Customers.AddRange(
-                    new Customer{ Username = "renosatyaadrian", FirstName = "Reno", LastName = "Satya", PhoneNumber = "088239185512", Email = "renosatyaadrian@gmail.com", Balance = 0, CreatedDate = DateTime.Now, Blocked = false },
-                    new Customer { Username = "rezaaditya", FirstName = "Reza", LastName = "Aditya", PhoneNumber = "088239185513", Email = "rezaaditya@gmail.com", Balance = 0, CreatedDate = DateTime.Now, Blocked = false }
+                    new Customer{ Username = "renosatyaadrian", FirstName = "Reno", LastName = "Satya", PhoneNumber = "088239185512", Email = "renosatyaadrian@gmail.com", Balance = 100000, CreatedDate = DateTime.Now, Blocked = false },
+                    new Customer { Username = "rezaaditya", FirstName = "Reza", LastName = "Aditya", PhoneNumber = "088239185513", Email = "rezaaditya@gmail.com", Balance = 100000, CreatedDate = DateTime.Now, Blocked = false }
                 );
 
                 context.SaveChanges();
@@ -53,8 +53,8 @@ namespace UserService.Data
             {
                 Console.WriteLine("--> Seeding data Drivers -->");
                 context.Drivers.AddRange(
-                    new Driver(){ Username = "bonigendul", FirstName = "Boni", LastName = "Gendul", Email = "bonigendul@gmail.com", PhoneNumber = 88291282, DriverLatitude = 0, DriverLongitude = 0, Balance = 0, Blocked = false},
-                    new Driver() { Username = "rijaldikurniawan", FirstName = "Rijaldi", LastName = "Kurniawan", Email = "rijaldikurniawan@gmail.com", PhoneNumber = 88291822, DriverLatitude = 0, DriverLongitude = 0, Balance = 0, Blocked = false }
+                    new Driver(){ Username = "bonigendul", FirstName = "Boni", LastName = "Gendul", Email = "bonigendul@gmail.com", PhoneNumber = 88291282, DriverLatitude = 0, DriverLongitude = 0, Balance = 200000, Blocked = false},
+                    new Driver() { Username = "rijaldikurniawan", FirstName = "Rijaldi", LastName = "Kurniawan", Email = "rijaldikurniawan@gmail.com", PhoneNumber = 88291822, DriverLatitude = 0, DriverLongitude = 0, Balance = 30000, Blocked = false }
                 );
 
                 context.SaveChanges();

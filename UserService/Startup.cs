@@ -147,6 +147,8 @@ namespace UserService
             {
                 endpoints.MapControllers();
             });
+
+            PrepDb.PrePopulation(app, env.IsProduction());
         }
     }
 }
