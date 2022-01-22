@@ -104,7 +104,8 @@ namespace UserService.Data
             var cust = await _dbContext.Customers.Where(u => u.Username == username && u.Blocked.Equals(false)).SingleOrDefaultAsync();
             var configApp = await _dbContext.ConfigApps.Where(conf => conf.Id == 1).FirstOrDefaultAsync();
             var price = roundedDistance * configApp.PricePerKM;
-            if(cust.Balance<price) throw new Exception("Mohon topup terlebih dahulu");
+            var deficitAmount = MathHelper.ToRupiah(price-cust.Balance);
+            if(cust.Balance<price) throw new Exception($"Mohon topup terlebih dahulu sebesar {deficitAmount}");
             try
             {
                 var order = new Order()
