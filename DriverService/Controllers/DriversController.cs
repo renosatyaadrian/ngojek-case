@@ -7,24 +7,26 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DriverService.Controllers
 {
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = "Driver")]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Driver")]
-    public class ProfilesController : ControllerBase
+    public class DriversController : ControllerBase
     {
         private readonly IDriverRepo _repository;
+        private IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IDriverDataClient _driverDataClient;
-        private readonly IMapper _mapper;
-
-        public ProfilesController(IDriverRepo repository, IDriverDataClient driverDataClient, IMapper mapper)
+        public DriversController(IDriverRepo repository, IMapper mapper, IHttpContextAccessor httpContextAccessor, IDriverDataClient driverDataClient)
         {
             _repository = repository;
-            _driverDataClient = driverDataClient;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
+            _driverDataClient = driverDataClient;
         }
 
         [HttpGet("Profile")]
@@ -47,15 +49,15 @@ namespace DriverService.Controllers
         }
 
         [HttpGet("Saldo")]
-        public ActionResult<ReadSaldoDto> ShowSaldo()
+        public async Task<ActionResult<ReadSaldoDto>> GetHistoryOrder()
         {
             try
             {
-                Console.WriteLine($"--> Getting Balance Driver: {_repository.ShowSaldo().Balance} .....");
-                var driveritem = _repository.ShowSaldo();
-                if (driveritem != null)
+                Console.WriteLine("--> Getting Saldo Driver .....");
+                var orderitem = await _driverDataClient.GetSaldoDriver();
+                if (orderitem != null)
                 {
-                    return Ok(_mapper.Map<ReadSaldoDto>(driveritem));
+                    return Ok(orderitem);
                 }
                 return NotFound();
             }
@@ -77,10 +79,10 @@ namespace DriverService.Controllers
                 {
                     try
                     {
-                        await _driverDataClient.SetPositionToOrderServicee(setPositionDto);
-
                         _repository.SetPosition(drivermodel);
                         _repository.SaveChanges();
+
+                        await _driverDataClient.SetPositionToOrderServicee(drivermodel);
 
                         return Ok($"Set Position Driver, Lat: {setPositionDto.DriverLatitude}, Long: {setPositionDto.DriverLongitude} Telah Berhasil");
                     }
@@ -96,6 +98,5 @@ namespace DriverService.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
     }
 }

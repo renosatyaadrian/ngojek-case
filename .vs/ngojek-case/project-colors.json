@@ -10,7 +10,12 @@
       "ProjectGuid": "7d36e71e-7046-421b-8204-181f9ecfaa8e",
       "DisplayName": "UserService",
       "ColorIndex": 1
+    },
+    "0a28521d-45fc-4f07-baa2-951ef3506c94": {
+      "ProjectGuid": "0a28521d-45fc-4f07-baa2-951ef3506c94",
+      "DisplayName": "OrderService",
+      "ColorIndex": 2
     }
   },
-  "NextColorIndex": 2
+  "NextColorIndex": 3
 }

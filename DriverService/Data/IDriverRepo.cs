@@ -14,16 +14,14 @@ namespace DriverService.Data
         Task Registration(DriverForCreateDto driverForCreateDto);
         Task<List<string>> GetRolesFromUser(string username);
         Task AddRole(string rolename);
+        void CreateDriver(Driver driver);
 
         //Profile
         Driver ShowProfile();
-        Driver ShowSaldo();
         void SetPosition(Driver obj);
 
         //Order
-        IEnumerable<OrderDto> GetAllOrders();
-        IEnumerable<OrderDto> GetHistoryOrder();
-        void AcceptOrder(int custId);
-        void FinishOrder(int custId);
+        void AcceptOrder(CustIdDto custIdDto);
+        void FinishOrder(CustIdDto custIdDto);
     }
 }

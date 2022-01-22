@@ -50,7 +50,7 @@ namespace OrderService.Migrations
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<int>(type: "int", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DriverLatitude = table.Column<double>(type: "float", nullable: true),
                     DriverLongitude = table.Column<double>(type: "float", nullable: true),
                     Balance = table.Column<double>(type: "float", nullable: false),

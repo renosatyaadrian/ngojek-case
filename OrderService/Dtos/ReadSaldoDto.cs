@@ -1,4 +1,4 @@
-﻿namespace DriverService.Dtos
+﻿namespace OrderService.Dtos
 {
     public class ReadSaldoDto
     {

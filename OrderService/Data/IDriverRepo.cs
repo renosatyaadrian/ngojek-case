@@ -1,4 +1,5 @@
-﻿using OrderService.Models;
+﻿using OrderService.Dtos;
+using OrderService.Models;
 using System.Collections.Generic;
 
 namespace OrderService.Data
@@ -10,11 +11,12 @@ namespace OrderService.Data
         //Profile
         void CreateDriver(Driver driver);
         void SetPosition(Driver obj);
+        Driver ShowSaldo();
 
         //Order
         IEnumerable<Order> GetAllOrders();
-        Order GetHistoryOrder();
-        void AcceptOrder(int custId);
-        void FinishOrder(int custId);
+        IEnumerable<Order> GetHistoryOrder();
+        void AcceptOrder(CustIdDto custIdDto);
+        void FinishOrder(CustIdDto custIdDto);
     }
 }

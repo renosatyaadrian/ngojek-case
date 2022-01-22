@@ -18,9 +18,11 @@ namespace DriverService.Models
         [Required]
         public string Email { get; set; }
         [Required]
-        public int PhoneNumber { get; set; }
-        public double? DriverLatitude { get; set; }
-        public double? DriverLongitude { get; set; }
+        public string PhoneNumber { get; set; }
+        [Required]
+        public double DriverLatitude { get; set; }
+        [Required]
+        public double DriverLongitude { get; set; }
         [Required]
         public double Balance { get; set; }
         [Required]
