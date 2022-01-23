@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DriverService.Controllers
@@ -15,13 +14,13 @@ namespace DriverService.Controllers
     [Authorize(AuthenticationSchemes = "Bearer", Roles = "Driver")]
     [Route("api/[controller]")]
     [ApiController]
-    public class DriversController : ControllerBase
+    public class ProfilesController : ControllerBase
     {
         private readonly IDriverRepo _repository;
         private IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IDriverDataClient _driverDataClient;
-        public DriversController(IDriverRepo repository, IMapper mapper, IHttpContextAccessor httpContextAccessor, IDriverDataClient driverDataClient)
+        public ProfilesController(IDriverRepo repository, IMapper mapper, IHttpContextAccessor httpContextAccessor, IDriverDataClient driverDataClient)
         {
             _repository = repository;
             _mapper = mapper;
