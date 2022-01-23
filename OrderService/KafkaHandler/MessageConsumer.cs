@@ -12,9 +12,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using OrderService.Data;
 using OrderService.Dtos;
+using OrderService.Helpers;
 using OrderService.Models;
 
 namespace OrderService.KafkaHandler
@@ -25,10 +27,16 @@ namespace OrderService.KafkaHandler
         {
         }
 
-        public static async Task<int> Consume()
+        public static async Task<int> Consume(bool isProd)
         {
+            string jsonConf = String.Empty;
+            if(isProd) jsonConf = "appsettings.Production.json";
+            else jsonConf = "appsettings.Development.json";
+            
+            Console.WriteLine(jsonConf);
+
             var builder = new ConfigurationBuilder()
-                    .AddJsonFile($"appsettings.json", true, true);
+                    .AddJsonFile(jsonConf, true, true);
 
             var config = builder.Build();
             var producerConfig = new ProducerConfig
