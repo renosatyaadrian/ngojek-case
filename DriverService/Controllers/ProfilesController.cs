@@ -48,7 +48,7 @@ namespace DriverService.Controllers
         }
 
         [HttpGet("Saldo")]
-        public async Task<ActionResult<ReadSaldoDto>> GetHistoryOrder()
+        public async Task<ActionResult<ReadSaldoDto>> GetSaldoDriver()
         {
             try
             {
