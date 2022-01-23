@@ -22,14 +22,28 @@ spec:
             name: driverapi-clusterip-srv
             port:
               number: 80
-         path: /d
+         path: /api/Administrations
+         pathType: Prefix
+       - backend:
+          service:
+            name: driverapi-clusterip-srv
+            port:
+              number: 80
+         path: /api/Orders
+         pathType: Prefix
+       - backend:
+          service:
+            name: driverapi-clusterip-srv
+            port:
+              number: 80
+         path: /api/Profiles
          pathType: Prefix
        - backend:
           service:
             name: orderapi-clusterip-srv
             port:
               number: 80
-         path: /o
+         path: /api/Drivers
          pathType: Prefix
        - backend:
           service:
