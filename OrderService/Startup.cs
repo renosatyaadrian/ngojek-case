@@ -129,7 +129,9 @@ namespace OrderService
                 endpoints.MapControllers();
             });
 
-            MessageConsumer.Consume();
+            PrepDb.PrePopulation(app, env.IsProduction());
+
+            MessageConsumer.Consume(env.IsProduction());
         }
     }
 }
