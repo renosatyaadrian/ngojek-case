@@ -117,8 +117,6 @@ namespace UserService.Data
                     Price = price,
                     Completed = false
                 };
-                _dbContext.Orders.Add(order);
-                await _dbContext.SaveChangesAsync();
                 
                 var key = "order-create-" + DateTime.Now.ToString();
                 var val = JObject.FromObject(order, new JsonSerializer()

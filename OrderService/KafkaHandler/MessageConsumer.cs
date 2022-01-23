@@ -74,7 +74,7 @@ namespace OrderService.KafkaHandler
             var Serverconfig = new ConsumerConfig
             {
                 BootstrapServers = config["Settings:KafkaServer"],
-                GroupId = "orders-1",
+                GroupId = "orders-2",
                 AutoOffsetReset = AutoOffsetReset.Latest
             };
             CancellationTokenSource cts = new CancellationTokenSource();
@@ -117,7 +117,18 @@ namespace OrderService.KafkaHandler
                                 case "user-add":
                                 Console.WriteLine(cr.Topic);
                                 Customer customer = JsonConvert.DeserializeObject<Customer>(cr.Message.Value);
-                                dbcontext.Customers.Add(customer);
+                                Customer newCustomer = new Customer
+                                {
+                                    Username = customer.Username,
+                                    FirstName = customer.FirstName,
+                                    LastName = customer.LastName,
+                                    PhoneNumber = customer.PhoneNumber,
+                                    Email = customer.Email,
+                                    Balance = customer.Balance,
+                                    CreatedDate = customer.CreatedDate,
+                                    Blocked = customer.Blocked
+                                };
+                                dbcontext.Customers.Add(newCustomer);
                                 break;
                             }
                             await dbcontext.SaveChangesAsync();
@@ -127,7 +138,6 @@ namespace OrderService.KafkaHandler
                 }
                 catch (OperationCanceledException)
                 {
-                    // Ctrl-C was pressed.
                 }
                 finally
                 {

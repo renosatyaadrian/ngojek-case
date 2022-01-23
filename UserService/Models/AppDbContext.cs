@@ -14,6 +14,7 @@ namespace UserService.Models
         {
         }
 
+        public DbSet<Admin> Admins { get; set; }
         public DbSet<ConfigApp> ConfigApps { get; set; }
         public DbSet<Driver> Drivers { get; set; }
         public DbSet<Order> Orders { get; set; }

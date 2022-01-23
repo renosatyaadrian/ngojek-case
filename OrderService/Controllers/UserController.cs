@@ -26,18 +26,32 @@ namespace OrderService.Controllers
         [HttpGet("{id}/Order/{orderId}")]
         public async Task<ActionResult<OrderDto>> GetOrderById(int id, int orderId)
         {
-            var order = await _user.GetOrderById(id, orderId);
-            var dtos = _mapper.Map<OrderDto>(order);
-            return Ok(dtos); 
+            try
+            {
+                var order = await _user.GetOrderById(id, orderId);
+                var dtos = _mapper.Map<OrderDto>(order);
+                return Ok(dtos);  
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            } 
         }
 
         [Authorize(Roles = "User")]
         [HttpGet("{id}/Orders")]
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetOrderHistory(int id)
         {
-            var orders = await _user.GetOrdersHistory(id);
-            var dtos = _mapper.Map<IEnumerable<OrderDto>>(orders);
-            return Ok(dtos);
+            try
+            {
+                var orders = await _user.GetOrdersHistory(id);
+                var dtos = _mapper.Map<IEnumerable<OrderDto>>(orders);
+                return Ok(dtos);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

@@ -7,7 +7,7 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: 'true'
 spec:
   rules:
-  - host: devbootcamp-graph.id
+  - host: devbootcamp-ojek.co.id
     http:
       paths:
        - backend:
@@ -15,7 +15,7 @@ spec:
             name: userapi-clusterip-srv
             port: 
               number: 80
-         path: /u
+         path: /api/Users
          pathType: Prefix
        - backend:
           service:
@@ -50,5 +50,5 @@ spec:
             name: adminapi-clusterip-srv
             port:
               number: 80
-         path: /a
+         path: /api/Admin
          pathType: Prefix
