@@ -1,22 +1,17 @@
-#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
-WORKDIR /src
-COPY ["DriverService/DriverService.csproj", "DriverService/"]
-RUN dotnet restore "DriverService/DriverService.csproj"
-COPY . .
-WORKDIR "/src/DriverService"
-RUN dotnet build "DriverService.csproj" -c Release -o /app/build
+ENV ASPNETCORE_URLS=http://+:8001
 
-FROM build AS publish
-RUN dotnet publish "DriverService.csproj" -c Release -o /app/publish
+COPY *.csproj ./
+RUN dotnet restore
 
-FROM base AS final
+COPY . ./
+RUN dotnet publish -c Release -o out
+
+FROM mcr.microsoft.com/dotnet/aspnet:5.0
 WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "DriverService.dll"]
+COPY --from=build-env /app/out .
+ENTRYPOINT [ "dotnet", "DriverService.dll" ]
