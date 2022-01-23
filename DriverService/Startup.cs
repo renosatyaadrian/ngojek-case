@@ -40,7 +40,7 @@ namespace DriverService
             {
                 Console.WriteLine("--> using sql server db");
                 services.AddDbContext<ApplicationDbContext>(opt => opt.UseSqlServer(
-                    Configuration.GetConnectionString("ProductionConnection")
+                    Configuration.GetConnectionString("AzureConnection")
                 ));
             }
             else
