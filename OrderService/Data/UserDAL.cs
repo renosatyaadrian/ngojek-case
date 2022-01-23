@@ -22,9 +22,15 @@ namespace OrderService.Data
         
         public async Task<Order> GetOrderById(int id, int orderId)
         {
-            var order = await _dbContext.Orders.FirstOrDefaultAsync(ord => ord.Id == orderId && ord.CustomerId == id);
-            if(order == null) throw new Exception($"Order tidak ditemukan");
-            return order;
+            try
+            {
+                var order = await _dbContext.Orders.FirstOrDefaultAsync(ord => ord.Id == orderId && ord.CustomerId == id);
+                return order;
+            }
+            catch (System.Exception)
+            {
+                throw new Exception($"Order tidak ditemukan");
+            }
         }
 
         public async Task<ICollection<Order>> GetOrdersHistory(int id)
