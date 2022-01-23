@@ -131,7 +131,7 @@ namespace OrderService.KafkaHandler
                                 dbcontext.Customers.Add(newCustomer);
                                 break;
                             }
-                            dbcontext.SaveChanges();
+                            await dbcontext.SaveChangesAsync();
                             Console.WriteLine("Data was saved into database");
                         }
                     }
