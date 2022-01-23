@@ -23,7 +23,6 @@ namespace OrderService.Models
         public double DriverLatitude { get; set; }
         public double DriverLongitude { get; set; }
         public double Balance { get; set; }
-        public bool Blocked { get; set; }
         public DateTime CreatedDate { get; set; }
         public virtual ICollection<Order> Orders { get; set; }
     }
