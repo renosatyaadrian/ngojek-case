@@ -25,11 +25,14 @@ namespace OrderService.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // var builder = new ConfigurationBuilder()
-            //        .AddJsonFile($"appsettings.json", true, true);
-
-            // var config = builder.Build();
-            // optionsBuilder.UseSqlServer(config["ConnectionStrings:LocalSQLEdge"]);
+            if (!optionsBuilder.IsConfigured)
+            {
+                var builder = new ConfigurationBuilder()
+                    .AddJsonFile($"appsettings.Production.json", true, true);
+                
+                var config = builder.Build();
+                optionsBuilder.UseSqlServer(config["ConnectionStrings:AzureConnection"]);
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
