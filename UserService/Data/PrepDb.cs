@@ -53,8 +53,8 @@ namespace UserService.Data
             {
                 Console.WriteLine("--> Seeding data Drivers -->");
                 context.Drivers.AddRange(
-                    new Driver(){ Username = "bonigendul", FirstName = "Boni", LastName = "Gendul", Email = "bonigendul@gmail.com", PhoneNumber = 88291282, DriverLatitude = 0, DriverLongitude = 0, Balance = 200000, Blocked = false},
-                    new Driver() { Username = "rijaldikurniawan", FirstName = "Rijaldi", LastName = "Kurniawan", Email = "rijaldikurniawan@gmail.com", PhoneNumber = 88291822, DriverLatitude = 0, DriverLongitude = 0, Balance = 30000, Blocked = false }
+                    new Driver(){ Username = "bonigendul", FirstName = "Boni", LastName = "Gendul", Email = "bonigendul@gmail.com", PhoneNumber = "88291282", DriverLatitude = 0, DriverLongitude = 0, Balance = 200000, Blocked = false},
+                    new Driver() { Username = "rijaldikurniawan", FirstName = "Rijaldi", LastName = "Kurniawan", Email = "rijaldikurniawan@gmail.com", PhoneNumber = "88291822", DriverLatitude = 0, DriverLongitude = 0, Balance = 30000, Blocked = false }
                 );
 
                 context.SaveChanges();
