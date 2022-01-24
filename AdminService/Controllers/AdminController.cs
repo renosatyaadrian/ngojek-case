@@ -170,7 +170,7 @@ namespace AdminService.Controllers
         {
             try
             {
-                Console.WriteLine($"--> Admin Blocking Customer Id : {customerId}  <--");
+                Console.WriteLine($"--> Admin Unblocking Customer Id : {customerId}  <--");
 
                 _admin.UnblockCustomer(customerId);
                 _admin.SaveChanges();
