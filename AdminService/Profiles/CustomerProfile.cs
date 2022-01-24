@@ -8,9 +8,7 @@ namespace AdminService.Profiles
     {
         public CustomerProfile()
         {
-            CreateMap<Customer, CustomerDto>().ForMember(dest => dest.FullName, opt => opt.MapFrom(dri => $"{dri.FirstName} {dri.LastName}"));
-
-            CreateMap<Customer, CustomerDto>();
+            CreateMap<Customer, CustomerDto>().ForMember(dest => dest.FullName, opt => opt.MapFrom(dri => (dri.FirstName + " " + dri.LastName)));
         }
     }
 }
